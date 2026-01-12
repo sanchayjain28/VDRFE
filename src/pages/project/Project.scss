@@ -1,0 +1,42 @@
+.project-page-container {
+  height: 100%;
+  padding: 25px 25px 0;
+
+  // .container {
+  //   max-width: 1600px;
+  //   margin: 0 auto;
+  // }
+
+  .project-list-wrapper {
+    overflow: auto;
+    height: calc(100vh - 186px);
+    margin: 0 -25px 0 0;
+    overflow-x: hidden;
+    padding-right: 25px;
+    padding-bottom: 20px;
+  }
+
+  .section-title {
+    margin-top: 0px;
+    margin-bottom: 16px;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    .page-header-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+
+      .quick-search {
+        width: 300px;
+        height: 32px;
+
+      }
+    }
+  }
+}

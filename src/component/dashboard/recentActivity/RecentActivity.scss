@@ -1,0 +1,89 @@
+.activity-wrapper {
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+
+    .search-container {
+        margin-bottom: 16px;
+
+        .search-input {
+            height: 40px;
+            border-radius: 3px;
+            border: 1px solid var(--border-color);
+            padding: 0px 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--primary);
+            background: #ffffff;
+            width: 100%;
+        }
+    }
+
+    .activity-list {
+        .ant-list-item {
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+            border: 0px;
+            margin: 0px;
+            padding: 10px 0px;
+            position: relative;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            .ant-avatar {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+                font-weight: 500;
+                background: #E2E5E49E;
+                color: #1D4D1F;
+
+                .erm-icon {
+                    width: 20px;
+                    height: 20px;
+                    color: #1D4D1F;
+                }
+            }
+        }
+
+        .activity-item {
+            .ant-list-item-meta-title {
+                font-size: 14px;
+                font-weight: 500;
+                color: var(--primary);
+                line-height: 18px;
+                margin-bottom: 4px;
+            }
+
+            .ant-list-item-meta-description {
+                font-size: 12px;
+                font-weight: 500;
+                color: #577462;
+                opacity: 0.82;
+            }
+        }
+
+        .new-tag {
+            color: #ffffff;
+            background: #F59F0B;
+            padding: 2px 8px;
+            border-radius: 31px;
+            font-size: 10px;
+            font-weight: 600;
+            position: absolute;
+            right: 0;
+            bottom: 14px;
+        }
+    }
+}
+
+.section-title {
+    margin-top: 0px;
+    margin-bottom: 16px;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--primary);
+}
+

@@ -1,0 +1,60 @@
+.filter-bar {
+    display: flex;
+    gap: 12px;
+    margin: 0 0 18px;
+    align-items: center;
+    justify-content: space-between;
+
+    .primary-btn {
+        height: 40px;
+    }
+
+    .dropdown-ui {
+        width: 178px;
+        padding-left: 60px !important;
+        position: relative;
+
+        &::before {
+            content: "Status:";
+            font-size: var(--overall-paragraph-size);
+            font-weight: 500;
+            line-height: 26px;
+            color: #5A7665;
+            position: absolute;
+            left: 10px;
+            top: 5px;
+        }
+    }
+
+    .filter-left {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .quick-search {
+        height: 40px;
+        font-size: 14px;
+        width: 240px;
+
+        .erm-icon[class*="search-icon"] {
+            width: 20px;
+            height: 20px;
+        }
+    }
+
+    .status-trigger {
+        width: 96px;
+        height: 40px;
+        gap: 8px;
+        color: var(--primary);
+        font-size: var(--overall-paragraph-size);
+        font-weight: 500;
+
+        .erm-icon {
+            color: var(--primary);
+            width: 16px;
+            height: 16px;
+        }
+    }
+}

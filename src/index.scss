@@ -1,0 +1,538 @@
+@use "../public/assets/scss/fonts.scss" as fonts;
+@use "../public/assets/scss/variables.scss" as variables;
+@use "../public/assets/scss/icons.scss" as icons;
+
+:root {
+  font-family: var(--primary-font);
+  font-optical-sizing: auto;
+  line-height: 1.5;
+  font-weight: 400;
+  font-style: normal;
+
+  color-scheme: light dark;
+  color: var(--primary);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--white);
+  font-family: var(--primary-font);
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--primary);
+
+
+  * {
+    box-sizing: border-box;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+button:focus,
+button:focus-visible {
+  outline: none !important;
+}
+
+// Scrollbar Start
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: var(--white-smoke);
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--grey);
+}
+
+
+.rc-virtual-list-scrollbar {
+  width: 5px !important;
+  background: var(--white-smoke) !important;
+}
+
+.rc-virtual-list-scrollbar-thumb {
+  background-color: var(--grey) !important;
+}
+
+
+// Buttons
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button:hover {
+  border-color: #646cff;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+button:disabled {
+  opacity: 0.5;
+}
+
+.primary-btn {
+  background: var(--primary-btn-bg) !important;
+  color: var(--primary) !important;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  border: none !important;
+  box-shadow: none !important;
+
+  &.ant-btn-variant-solid:not(:disabled):not(.ant-btn-disabled):hover,
+  &:not(:disabled):hover {
+    background: var(--primary-btn-hover-bg) !important;
+    color: var(--primary);
+
+  }
+}
+
+.secondary-btn {
+  background-color: transparent !important;
+  border: solid 1px #0a2b14 !important;
+  color: #0a2b14 !important;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  box-shadow: none !important;
+
+  &:hover {
+    border-color: #000 !important;
+    color: #000 !important;
+  }
+}
+
+.transparent-btn {
+  background-color: transparent !important;
+  border: none !important;
+  color: var(--primary) !important;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+
+  &:hover {
+    color: var(--primary-btn-hover-bg) !important;
+
+    i {
+      color: var(--primary-btn-hover-bg) !important;
+    }
+  }
+}
+
+.prompt-btn {
+  background: #d3dfd4b5;
+  color: var(--primary) !important;
+  font-weight: 400;
+  font-size: 14px;
+  border: 1px solid #d3dfd482 !important;
+  box-shadow: none !important;
+  border-radius: 37px !important;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  gap: 4px;
+  display: none;
+
+  &:hover {
+    background: var(--primary-btn-hover-bg) !important;
+  }
+}
+
+
+.ant-avatar {
+  background: var(--border-color);
+  color: var(--primary-green);
+}
+
+
+// Checkbox styles
+
+.ant-checkbox-wrapper {
+  font-size: 13px;
+  color: var(--primary);
+
+  &:hover {
+    .ant-checkbox-inner {
+      border-color: var(--primary-green) !important;
+    }
+
+    .ant-checkbox-checked .ant-checkbox-inner {
+      background-color: var(--primary-green) !important;
+    }
+  }
+}
+
+.ant-checkbox {
+  .ant-checkbox-inner {
+    border-radius: 3px;
+    box-shadow: 0px 1px 2.1px 0px #0000000d;
+  }
+
+  &.ant-checkbox-checked {
+    .ant-checkbox-inner {
+      background-color: var(--primary-green);
+      border-color: var(--primary-green) !important;
+    }
+  }
+}
+
+.ant-tree-checkbox-inner {
+  border-radius: 3px !important;
+  box-shadow: 0px 1px 2.1px 0px #0000000d;
+
+  &:hover {
+    border-color: var(--primary-green) !important;
+  }
+}
+
+.ant-tree .ant-tree-checkbox-wrapper-checked:not(.ant-tree-checkbox-wrapper-disabled):hover .ant-tree-checkbox-inner,
+.ant-tree .ant-tree-checkbox-checked:not(.ant-tree-checkbox-disabled):hover .ant-tree-checkbox-inner,
+.ant-tree .ant-tree-checkbox-checked .ant-tree-checkbox-inner {
+  background-color: var(--primary-green) !important;
+  border-color: var(--primary-green) !important;
+}
+
+.ant-input,
+.ant-input-outlined {
+
+  &:focus,
+  &:focus-within {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+}
+
+
+.ant-select-arrow {
+  display: flex;
+  justify-content: end;
+
+  .erm-icon {
+    margin: 0 !important;
+    transition: all 0.3s !important;
+  }
+}
+
+.field-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: #0A0A0A;
+  margin-bottom: 6px;
+}
+
+.dropdown-ui {
+  .erm-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0 !important;
+    transition: all 0.3s;
+  }
+
+  .dropdown-top-arrow-icon {
+    opacity: 0;
+  }
+}
+
+.ant-select-open {
+  .ant-select-suffix {
+    .dropdown-top-arrow-icon {
+      opacity: 1;
+    }
+
+    .dropdown-arrow-icon {
+      opacity: 0;
+    }
+  }
+}
+
+//input field override
+
+.input-field,
+.textarea {
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: var(--overall-paragraph-size);
+  font-weight: 400;
+  color: var(--primary);
+  background: var(--white);
+  resize: none !important;
+  width: 100%;
+  outline: none !important;
+  box-shadow: none !important;
+
+  &:focus,
+  &:hover {
+    border-color: var(--primary-green);
+    box-shadow: none;
+  }
+
+  &.select-field {
+    background: var(--white);
+    outline: none !important;
+    box-shadow: none !important;
+    width: 100%;
+
+    &:focus {
+      border-color: var(--primary-green);
+      box-shadow: none;
+      outline: none;
+    }
+  }
+}
+
+.ant-picker-outlined:focus,
+.ant-picker-outlined:focus-within {
+  border-color: var(--primary-green);
+}
+
+.ant-form-item {
+  margin-bottom: 20px;
+}
+
+//dropdown override
+
+.dropdown-ui {
+  border: 1px solid var(--input-border) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 8px;
+  height: 40px;
+  padding: 5px 10px !important;
+  position: relative;
+
+  &:focus,
+  &:hover,
+  &.ant-select-open {
+    border-color: var(--primary-green) !important;
+    box-shadow: none;
+  }
+
+  .ant-select-content-value {
+    color: var(--primary);
+    font-size: var(--overall-paragraph-size);
+    font-weight: 500;
+  }
+
+  .ant-select-item {
+    padding: 10px 12px !important;
+    border: solid 1px transparent;
+
+    &:hover,
+    &.ant-select-item-option-active {
+      border: 1px solid var(--dropdown-hover-border) !important;
+      background: var(--dropdown-hover) !important;
+    }
+
+    &.ant-select-item-option-selected {
+      font-weight: 600 !important;
+      background: transparent !important;
+      border-color: transparent !important;
+
+      &:hover {
+        border: 1px solid var(--dropdown-hover-border) !important;
+        background: var(--dropdown-hover) !important;
+      }
+    }
+
+    .ant-select-item-option-content {
+      font-weight: 400 !important;
+      font-size: 12px !important;
+      color: var(--font-color);
+
+    }
+  }
+
+  .ant-select-item::after {
+    content: '';
+    display: block;
+    background: linear-gradient(90deg, #FFFFFF -5.46%, #A3EAEA 50.65%, #FFFFFF 105.68%);
+    width: 100%;
+    height: 1px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+  }
+
+  .ant-select-item:last-child:after {
+    display: none;
+  }
+}
+
+.ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: #f4f7f4 !important;
+}
+
+//Tooltip styles
+.ant-tooltip .ant-tooltip-container {
+  background-color: #012C12 !important;
+  font-size: 12px;
+  line-height: 15px;
+  font-weight: 500;
+  padding: 12px;
+}
+
+/* Tooltip arrow */
+.ant-tooltip-arrow::before {
+  background-color: #012C12 !important;
+}
+
+
+// modal base style
+.ant-modal .ant-modal-content {
+  background-color: var(--modal-bg);
+  border-radius: var(--border-radius-5);
+  padding: 0;
+
+  .ant-modal-header {
+    margin-bottom: 0;
+    background-color: var(--modal-bg);
+    padding: 14px 24px;
+
+    .ant-modal-title {
+      font-size: 20px;
+      color: var(--primary);
+      font-weight: 500;
+    }
+  }
+
+  .ant-modal-close {
+    color: var(--black);
+
+    .anticon svg {
+      height: 15px;
+      width: 15px;
+    }
+  }
+
+  .ant-modal-body {
+    padding: 14px 24px;
+
+    .ant-input {
+      border-color: var(--input-border) !important;
+      box-shadow: none;
+      border-radius: var(--border-radius-5);
+    }
+  }
+
+  .ant-modal-footer {
+    padding: 14px 24px;
+    margin-top: 0;
+  }
+}
+
+
+// Toast css
+.Toastify__toast {
+  padding: 13px 16px;
+  border: solid 1px #000;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 19px;
+  min-height: 53px;
+  box-shadow: 0px 4px 12px 0px #0000001a;
+}
+
+.Toastify__toast-theme--light.Toastify__toast--success {
+  border-color: var(--primary-btn-bg);
+  color: var(--primary);
+
+  svg {
+    fill: var(--primary);
+  }
+}
+
+.Toastify__toast-theme--light.Toastify__toast--error {
+  border-color: #ff4444;
+  color: #6b0000;
+
+  svg {
+    fill: #6b0000;
+  }
+}
+
+.Toastify__toast-icon {
+  width: 16px;
+}
+
+.ant-drawer .ant-drawer-mask.ant-drawer-mask-blur {
+  backdrop-filter: inherit;
+  background: rgba(0, 0, 0, 0.50);
+}
+
+.ant-form-item-explain-error {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.prompt-btn {
+  background: #d3dfd4b5;
+  color: var(--primary) !important;
+  font-weight: 400;
+  font-size: 14px;
+  border: 1px solid rgba(211, 223, 212, .5098039216) !important;
+  box-shadow: none !important;
+  border-radius: 37px !important;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  gap: 4px;
+  display: flex;
+}

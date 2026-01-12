@@ -1,0 +1,81 @@
+.home-page {
+    .container {
+        padding: 25px;
+        max-width: 1600px;
+        margin: 0 auto;
+    }
+
+    // Summary Cards
+    .summary-card {
+        border: 1px solid #C8EDC8;
+        padding: 20px 24px;
+        border-radius: 12px;
+        background: #F6F9F6;
+        position: relative;
+        height: 100%;
+
+        .summary-card-content {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ant-statistic-header {
+            padding-bottom: 0px;
+        }
+
+        .ant-statistic-title {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--primary);
+            opacity: 0.65;
+        }
+
+        .ant-statistic-content-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .summary-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &.flag-icon {
+                background: #EB23221C;
+                color: #EB2322;
+            }
+
+            &.scope-icon {
+                background: #C9E8ED87;
+                color: #007A8E;
+            }
+
+            &.check-icon {
+                background: #DEF5DF;
+                color: #019A20;
+            }
+
+            .erm-icon {
+                font-size: 28px;
+                width: 28px;
+                height: 28px;
+            }
+        }
+    }
+
+    .section-title {
+        margin-top: 0px;
+        margin-bottom: 16px;
+        font-size: 20px;
+        font-weight: 500;
+        color: var(--primary);
+    }
+
+
+}

@@ -1,0 +1,113 @@
+.project-card {
+  border-radius: 12px;
+  box-shadow: none;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0px 8px 24.6px 0px #0000000D;
+  }
+
+  .ant-card-body {
+    padding: 20px;
+  }
+
+  .date-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--primary);
+    opacity: 0.65;
+  }
+
+  .risk-tag {
+    padding: 5px 8px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 400;
+
+    .erm-icon {
+      width: 14px;
+      height: 14px;
+    }
+
+    &.low-risk {
+      background: #0DAD551C;
+      color: #0DAD55;
+
+      .erm-icon {
+        color: #0DAD55;
+      }
+    }
+
+    &.medium-risk {
+      background: #FFF7EA;
+      color: #EE9300;
+
+      .erm-icon {
+        color: #EE9300;
+      }
+    }
+
+    &.high-risk {
+      background: #FFF2EADE;
+      color: #FD582D;
+
+      .erm-icon {
+        color: #FD582D;
+      }
+    }
+  }
+
+  .scope-tag {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 400;
+    border: 1px solid #D3DFD49E;
+    background: #ffffff;
+
+    .ant-divider {
+      margin: 0 2px;
+    }
+  }
+
+  .file-blue-icon,
+  .scope-icon {
+    color: #5A7665 !important;
+    font-size: 15px !important;
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .status-badge {
+    background-color: #d3dfd461;
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    .status-title {
+      color: #012c12;
+      font-size: 12px;
+    }
+  }
+
+  .ant-progress-track {
+    height: 8px;
+    background: linear-gradient(to right,
+        #14a800 0%,
+        #14a800 50%,
+        #f5a623 50%,
+        #f5a623 100%);
+  }
+}

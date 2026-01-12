@@ -1,0 +1,171 @@
+.add-scope-drawer {
+    .ant-drawer-header {
+        display: block;
+    }
+
+    .ant-drawer-header-title {
+        align-items: self-start;
+        flex-direction: row-reverse;
+    }
+
+    .ant-drawer-close {
+        background: transparent !important;
+        padding: 0;
+        margin: 0 !important;
+    }
+
+    .ant-drawer-body {
+        padding: 25px;
+    }
+
+    .ant-drawer-header {
+        border-color: var(--border-color);
+        padding: 25px;
+
+        .drawer-title {
+            color: var(--primary);
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0 0 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            .header-icon {
+                display: flex;
+            }
+        }
+
+        .drawer-subtitle {
+            margin: 0;
+            color: #587564;
+            font-size: 14px;
+            font-weight: 400;
+        }
+    }
+
+    .drawer-footer {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+
+        label {
+            color: var(--primary);
+            font-size: var(--overall-paragraph-size);
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        &.mb-0 {
+            margin-bottom: 0;
+        }
+    }
+
+    .ant-form-item-label {
+        >label {
+            color: var(--primary);
+            font-size: var(--overall-paragraph-size);
+            font-weight: 500;
+
+            .required {
+                color: #FD582D;
+                margin-left: 4px;
+            }
+        }
+
+        &.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
+            >label::before {
+                display: none;
+            }
+        }
+    }
+
+    .risk-level-group {
+        display: flex;
+        gap: 12px;
+
+        .risk-btn {
+            flex: 1;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--primary);
+            height: 40px;
+            text-align: center;
+
+            .risk-icon {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                display: inline-block;
+            }
+
+            &.low {
+                .risk-icon {
+                    background: #019A20;
+                }
+            }
+
+            &.medium {
+                .risk-icon {
+                    background: #F59F0B
+                }
+
+                &.active {
+                    border-color: var(--primary-green);
+                    background: #019A2014;
+                }
+            }
+
+            &.high {
+                .risk-icon {
+                    background: #FD582D;
+                }
+            }
+        }
+    }
+
+
+    .info-text {
+        font-size: 12px;
+        color: #587564;
+        font-weight: 400;
+        margin-top: 8px;
+    }
+
+    .scope-preview {
+        border: 1px solid var(--input-border);
+        background: #EEF1F24D;
+        border-radius: 11px;
+        padding: 18px 20px;
+
+        .preview-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--primary);
+            margin: 0px 0px 12px 0;
+        }
+
+        .preview-progress {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--primary);
+        }
+
+        .progress-count {
+            font-size: 13px;
+            color: #587564;
+            font-weight: 500;
+        }
+    }
+
+}

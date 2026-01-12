@@ -1,0 +1,268 @@
+.erm-icon {
+  mask-size: contain;
+  mask-position: 50% 50%;
+  mask-repeat: no-repeat;
+  background: currentColor;
+  width: 1em;
+  height: 1em;
+  display: block;
+
+  // custom icons
+  &[class*="toggle"] {
+    mask-image: url(/assets/icons/toggle.svg);
+  }
+
+  &[class*="filter-icon"] {
+    mask-image: url(/assets/icons/filter-icon.svg);
+    width: 14px;
+    height: 14px;
+    color: #53705E;
+  }
+
+  &[class*="search-icon"] {
+    mask-image: url(/assets/icons/search-icon.svg);
+    width: 16px;
+    height: 16px;
+    color: var(--primary);
+  }
+
+  &[class*="plus-icon"] {
+    mask-image: url(/assets/icons/plus-icon.svg);
+    width: 18px;
+    height: 18px;
+  }
+
+  &[class*="calendar-icon"] {
+    mask-image: url(/assets/icons/calendar-icon.svg);
+    width: 15px;
+    height: 15px;
+    color: #5A7665;
+  }
+
+  &[class*="dropdown-arrow-icon"] {
+    mask-image: url(/assets/icons/dropdown-arrow-icon.svg);
+    width: 10px;
+    height: 10px;
+    color: var(--primary);
+  }
+
+  &[class*="dropdown-top-arrow-icon"] {
+    mask-image: url(/assets/icons/dropdown-top-arrow-icon.svg);
+    width: 10px;
+    height: 10px;
+    color: var(--primary);
+  }
+
+  &[class*="ai-icon"] {
+    mask-image: url(/assets/icons/ai-icon.svg);
+    width: 12px;
+    height: 14px;
+    color: var(--primary);
+  }
+
+  &[class*="time-icon"] {
+    mask-image: url(/assets/icons/time-icon.svg);
+    width: 28px;
+    height: 28px;
+    color: #F49A00;
+  }
+
+  &[class*="doc-icon"] {
+    mask-image: url(/assets/icons/doc-icon.svg);
+    width: 28px;
+    height: 28px;
+    color: #246027;
+  }
+
+  &[class*="check-icon"] {
+    mask-image: url(/assets/icons/check-icon.svg);
+    width: 28px;
+    height: 28px;
+    color: var(--primary-green);
+  }
+
+  &[class*="file-icon"] {
+    mask-image: url(/assets/icons/file-icon.svg);
+    width: 15px;
+    height: 15px;
+    color: #5A7665;
+  }
+
+  &[class*="more-icon"] {
+    mask-image: url(/assets/icons/more-icon.svg);
+    width: 22px;
+    height: 22px;
+    color: #809689;
+  }
+
+  &[class*="close-icon"] {
+    mask-image: url(/assets/icons/close-icon.svg);
+    width: 20px;
+    height: 20px;
+    color: #000;
+  }
+
+  &[class*="zoom-plus-icon"] {
+    mask-image: url(/assets/icons/zoom-plus-icon.svg);
+    width: 16px;
+    height: 16px;
+    color: var(--primary);
+  }
+
+  &[class*="zoom-minus-icon"] {
+    mask-image: url(/assets/icons/zoom-minus-icon.svg);
+    width: 16px;
+    height: 16px;
+    color: var(--primary);
+  }
+
+  &[class*="expend-icon"] {
+    mask-image: url(/assets/icons/expend-icon.svg);
+    width: 16px;
+    height: 16px;
+    color: var(--primary);
+  }
+
+  &[class*="info-icon"] {
+    mask-image: url(/assets/icons/info-icon.svg);
+    width: 16px;
+    height: 16px;
+    color: var(--black);
+  }
+
+  &[class*="approve-icon"] {
+    mask-image: url(/assets/icons/approve-icon.svg);
+    width: 15px;
+    height: 15px;
+    color: #6AC265F5;
+  }
+
+  &[class*="reject-icon"] {
+    mask-image: url(/assets/icons/reject-icon.svg);
+    width: 15px;
+    height: 15px;
+    color: #FD582DAB;
+  }
+
+  &[class*="refresh-icon"] {
+    mask-image: url(/assets/icons/refresh-icon.svg);
+    width: 14px;
+    height: 14px;
+    color: var(--primary);
+  }
+
+  &[class*="refresh-double-icon"] {
+    mask-image: url(/assets/icons/refresh-double-icon.svg);
+    width: 20px;
+    height: 20px;
+    color: var(--primary);
+  }
+
+  &[class*="file-blue-icon"] {
+    mask-image: url(/assets/icons/file-blue-icon.svg);
+    width: 28px;
+    height: 28px;
+    color: #007A8E;
+  }
+
+  &[class*="flag-icon"] {
+    mask-image: url(/assets/icons/flag-icon.svg);
+    width: 14px;
+    height: 14px;
+    color: #EB2322;
+  }
+
+  &[class*="assessment-icon"] {
+    mask-image: url(/assets/icons/assessment.svg);
+  }
+
+  &[class*="scope-icon"] {
+    mask-image: url(/assets/icons/scope-icon.svg);
+    color: #007A8E;
+  }
+
+  &[class*="warning-icon"] {
+    mask-image: url(/assets/icons/warning-icon.svg);
+    color: #F49A00;
+  }
+
+  &[class*="active-icon"] {
+    mask-image: url(/assets/icons/active.svg);
+    width: 10px;
+    height: 10px;
+    color: #76f28f;
+  }
+
+  &[class*="inactive-icon"] {
+    mask-image: url(/assets/icons/active.svg);
+    width: 10px;
+    height: 10px;
+    color: #c4c4c4;
+  }
+
+  &[class*="prompts-icon"] {
+    mask-image: url(/assets/icons/prompts-icon.svg);
+    width: 12px;
+    color: var(--primary-green);
+  }
+
+  &[class*="source"] {
+    mask-image: url(/assets/icons/source.svg);
+  }
+
+  &[class*="history"] {
+    mask-image: url(/assets/icons/chat-history.svg);
+    color: var(--primary);
+  }
+
+  &[class*="setting"] {
+    mask-image: url(/assets/icons/setting.svg);
+    height: 21px;
+    width: 21px;
+  }
+
+  &[class*="guides"] {
+    mask-image: url(/assets/icons/guides.svg);
+    height: 21px;
+    width: 21px;
+  }
+
+  &[class*="deep-research"] {
+    mask-image: url(/assets/icons/deep-research.svg);
+  }
+
+  &[class*="logout"] {
+    mask-image: url(/assets/icons/logout.svg);
+    height: 21px;
+    width: 21px;
+  }
+
+
+  &[class*="breadcrumb-separator-icon"] {
+    mask-image: url(/assets/icons/right-arrow.svg);
+    width: 20px;
+    height: 20px;
+    color: #084F30;
+  }
+
+  &[class*="arrow-right-icon"] {
+    mask-image: url(/assets/icons/arrow-right.svg);
+    width: 16px;
+    height: 16px;
+    color: var(--primary);
+  }
+
+  &[class*="next-icon"] {
+    mask-image: url(/assets/icons/next.svg);
+    width: 5px;
+    height: 8px;
+    color: var(--primary);
+  }
+
+  &[class*="edit-icon"] {
+    mask-image: url(/assets/icons/edit-icon.svg);
+    width: 15px;
+    height: 15px;
+    color: #3C5B44;
+  }
+}

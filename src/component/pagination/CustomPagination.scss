@@ -1,0 +1,104 @@
+.pagination-section {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  height: 55px;
+  border-radius: 0;
+  background: white;
+  font-family: var(--primary-font);
+  box-shadow: none;
+  z-index: 1;
+  position: relative;
+  gap: 12px;
+  border-top: solid 1px var(--border-color);
+  background: var(--pagination-section-bg);
+  box-shadow: none;
+  margin: 0 -25px;
+  padding: 0 25px;
+
+  .table-entries {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4e6c5a;
+
+    strong {
+      font-weight: 600;
+      color: #4e6c5a;
+    }
+  }
+
+  ul.ant-pagination {
+    padding: 0;
+    font-family: inherit;
+    color: var(--darker-grey);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--overall-paragraph-size);
+    margin-left: auto;
+
+    &:after {
+      display: none;
+    }
+
+    .ant-pagination-item {
+      font-family: var(--primary-font);
+      color: var(--primary);
+      border-radius: var(--border-radius-5);
+      border: 1px solid #d3dfd4;
+      font-weight: 500;
+      background: var(--body-bg);
+      margin: 0;
+      font-size: 13px;
+      border-radius: 4px;
+      min-width: 30px;
+      height: 30px;
+      line-height: 30px;
+
+      &:hover {
+        background: var(--primary-green) !important;
+        color: var(--white) !important;
+      }
+
+      &.ant-pagination-item-active,
+      &:hover {
+        background: var(--primary) !important;
+        color: var(--white) !important;
+        border-color: var(--primary) !important;
+      }
+
+      a {
+        color: inherit;
+      }
+    }
+
+    .ant-pagination-prev,
+    .ant-pagination-next {
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+      font-weight: 500;
+      margin: 0;
+      border: 1px solid #d3dfd4;
+      border-radius: var(--border-radius-5);
+      height: 30px;
+      width: 30px;
+      min-width: 30px;
+
+      &.ant-pagination-disabled {
+        color: var(--grey);
+      }
+
+      a {
+        color: inherit;
+      }
+    }
+
+    .ant-pagination-prev .ant-pagination-item-link,
+    .ant-pagination-next .ant-pagination-item-link {
+      border-radius: var(--border-radius-5);
+    }
+  }
+}

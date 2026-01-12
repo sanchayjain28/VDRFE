@@ -1,0 +1,66 @@
+body {
+
+    .message-content-skeleton .ant-skeleton.ant-skeleton-active .ant-skeleton-title,
+    .message-content-skeleton .ant-skeleton.ant-skeleton-active .ant-skeleton-paragraph>li,
+    .message-content-skeleton .ant-skeleton.ant-skeleton-active .ant-skeleton-avatar,
+    .message-content-skeleton .ant-skeleton.ant-skeleton-active .ant-skeleton-button,
+    .message-content-skeleton .ant-skeleton.ant-skeleton-active .ant-skeleton-input,
+    .message-content-skeleton .ant-skeleton.ant-skeleton-active .ant-skeleton-image {
+        background: linear-gradient(90deg, rgba(0, 0, 0, 0.15) 25%, rgba(211, 223, 212, 0.15) 37%, rgba(0, 0, 0, 0.15) 63%);
+        background-size: 400% 100%;
+        animation-name: css-dev-only-do-not-override-ade6es-ant-skeleton-loading;
+        animation-duration: 1.4s;
+        animation-timing-function:
+            ease;
+        animation-iteration-count: infinite;
+    }
+}
+
+.message-content-skeleton {
+    .ant-skeleton.ant-skeleton-element {
+        width: 100%;
+    }
+
+    .ant-skeleton-input {
+        height: 16px !important;
+    }
+
+    .skelton-set {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        width: 100%;
+        margin-bottom: 35px;
+    }
+
+    .skelton-big {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        background: #D3DFD442;
+        margin-bottom: 35px;
+        display: flex;
+
+        .skeltion-circle {
+            width: 34px;
+            height: 34px;
+            border-radius: 100%;
+            background: #D3DFD4;
+        }
+    }
+
+    .ant-skeleton.ant-skeleton-active .ant-skeleton-title,
+    .ant-skeleton.ant-skeleton-active .ant-skeleton-paragraph>li,
+    .ant-skeleton.ant-skeleton-active .ant-skeleton-avatar,
+    .ant-skeleton.ant-skeleton-active .ant-skeleton-button,
+    .ant-skeleton.ant-skeleton-active .ant-skeleton-input,
+    .ant-skeleton.ant-skeleton-active .ant-skeleton-image {
+        background: linear-gradient(90deg, rgba(211, 223, 212, 0.26) 25%, rgba(211, 223, 212, 0.15) 37%, rgba(211, 223, 212, 0.26) 63%);
+        background-size: 400% 100%;
+        animation-name: css-dev-only-do-not-override-ade6es-ant-skeleton-loading;
+        animation-duration: 1.4s;
+        animation-timing-function:
+            ease;
+        animation-iteration-count: infinite;
+    }
+}

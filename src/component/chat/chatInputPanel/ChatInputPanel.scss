@@ -1,0 +1,205 @@
+.chat-input-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: left;
+  padding: 20px;
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  position: sticky;
+  bottom: 0;
+  padding-top: 0px;
+
+  &.footer-chat {
+    .chat-input-box {
+      padding-top: 12px;
+    }
+  }
+
+  &.home-chat-input {
+    .chat-input-box {
+      box-shadow: 0px 0px 0px 6px rgba(255, 255, 255, 0.149);
+    }
+  }
+
+  .chat-input-box {
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #d3dfd4;
+    border-radius: 16px;
+    box-shadow: 0px 4px 15.8px 0px #c2d2c31a;
+    padding: 16px;
+    gap: 6px;
+    display: flex;
+    flex-direction: column;
+
+    .input-wrapper {
+      width: 100%;
+
+      .chat-input {
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        resize: none !important;
+        padding: 0px;
+        font-size: 16px;
+        font-weight: 500;
+        color: #012c12;
+
+        &::placeholder {
+          opacity: 1;
+        }
+
+        .ant-input-show-count::after {
+          display: none;
+        }
+      }
+    }
+
+    .input-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+
+      .left-controls,
+      .right-controls {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+
+        .chat-history-btn {
+          color: #7a9183;
+        }
+
+        .control-btn {
+          color: var(--menu-hover-bg);
+
+          &:hover {
+            border-color: var(--menu-hover-bg);
+            color: var(--menu-hover-bg);
+          }
+        }
+
+        .knowledge-dropdown {
+          // background-color: var(--bg-grey);
+          color: var(--menu-hover-bg);
+          font-size: 13px;
+          padding: 4px 8px;
+          border: 1px solid var(--menu-text-color);
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+
+          &:hover {
+            // background-color: $bg-gray;
+            color: var(--menu-hover-bg);
+          }
+        }
+      }
+
+      .right-controls {
+        .send-btn {
+          font-size: 13px;
+          background-color: var(--primary-btn-bg);
+          border-color: var(--primary-btn-bg);
+          color: var(--primary);
+          font-weight: 600;
+          padding: 4px 16px;
+
+          &:hover {
+            background-color: var(--primary-btn-hover-bg);
+            border-color: var(--primary-btn-hover-bg);
+          }
+        }
+
+        .stop-streaming-btn {
+          background: #e6ede7;
+        }
+      }
+
+      .source-select-btn {
+        border-radius: 3px;
+      }
+
+      .project-select {
+        width: 150px;
+
+        .ant-select-arrow {
+          color: var(--primary);
+        }
+
+        .ant-select-selector {
+          border-color: #d3dfd491 !important;
+          box-shadow: none !important;
+          border-radius: 32px;
+
+          .ant-select-selection-item,
+          .ant-select-selection-placeholder {
+            color: var(--primary);
+          }
+
+          &:not(.ant-select-disabled) {
+            .ant-select-selector:hover {
+              border-color: var(--menu-hover-bg);
+              color: var(--menu-hover-bg);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.project-select-dropdown {
+  width: 250px !important;
+}
+
+.project-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: #f4f7f4 !important;
+}
+
+.ask-btn {
+  flex-direction: row;
+}
+
+.prompt-btn {
+  background: #d3dfd4b5;
+  color: var(--primary) !important;
+  font-weight: 400;
+  font-size: 14px;
+  border: 1px solid rgba(211, 223, 212, .5098039216) !important;
+  box-shadow: none !important;
+  border-radius: 37px !important;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  gap: 4px;
+}
+
+@media (max-width: 767px) {
+  .chat-input-container {
+    padding: 20px 0;
+    padding-top: 0px;
+  }
+
+  .ask-btn {
+    width: 32px;
+    padding: 0 !important;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+
+    .ask-text {
+      font-size: 0 !important;
+    }
+  }
+}
+
+.dropdown-loading {
+  text-align: center;
+  width: 100%;
+}
