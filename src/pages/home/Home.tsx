@@ -93,7 +93,7 @@ const Home = () => {
   return (
     <div className="home-page">
       <div className="container">
-        <Space direction="vertical" size="large" style={{ width: "100%" }}>
+        <Space orientation="vertical" size="large" style={{ width: "100%" }}>
           {/* Header */}
           <Row justify="space-between" align="middle">
             <Col>

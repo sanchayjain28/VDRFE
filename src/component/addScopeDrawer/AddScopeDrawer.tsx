@@ -17,7 +17,7 @@ const AddScopeDrawer = ({ open, onClose }: AddScopeDrawerProps) => {
       open={open}
       onClose={onClose}
       placement="right"
-      width={480}
+      size={480}
       closable={true}
       className="add-scope-drawer add-flag-drawer"
       closeIcon={<i className="erm-icon close-icon" />}

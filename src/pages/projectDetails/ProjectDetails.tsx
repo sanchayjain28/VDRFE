@@ -1,11 +1,11 @@
+import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Breadcrumb, Table, Avatar, Button, Tooltip } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import "./ProjectDetails.scss";
 import { IMAGES, PATHS } from "../../shared";
 import { RecentActivity, ScopeFilterBar } from "../../component";
-import { useState, useMemo } from "react";
 import { Activity } from "../../component/dashboard/recentActivity/RecentActivity";
-import { useNavigate } from "react-router-dom";
+import "./ProjectDetails.scss";
 
 interface ScopeData {
   key: string;
@@ -241,10 +241,18 @@ const ProjectDetails = () => {
         </div>
         <div className="project-details-header-breadcrumb">
           <span>Service</span>
-          <Breadcrumb className="page-breadcrumb" separator={<i className="erm-icon breadcrumb-separator-icon"></i>}>
-            <Breadcrumb.Item>Mergers & Acquisitions</Breadcrumb.Item>
-            <Breadcrumb.Item>Private Markets ESG/Value Creation</Breadcrumb.Item>
-          </Breadcrumb>
+          <Breadcrumb 
+            className="page-breadcrumb" 
+            separator={<i className="erm-icon breadcrumb-separator-icon"></i>}
+            items={[
+              {
+                title: "Mergers & Acquisitions",
+              },
+              {
+                title: "Private Markets ESG/Value Creation",
+              },
+            ]}
+          />
         </div>
       </div>
       <div className="project-details-wrap">

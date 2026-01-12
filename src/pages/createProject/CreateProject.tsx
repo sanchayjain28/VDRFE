@@ -33,10 +33,17 @@ const CreateProject = () => {
               <div className="scope-header-wrapper">
                 <div className="scope-header">
                   <div className="breadcrumb-wrapper">
-                    <Breadcrumb className="page-breadcrumb">
-                      <Breadcrumb.Item onClick={() => navigate(PATHS.home)}>Home</Breadcrumb.Item>
-                      <Breadcrumb.Item>Create Project</Breadcrumb.Item>
-                    </Breadcrumb>
+                    <Breadcrumb 
+                      className="page-breadcrumb"
+                      items={[
+                        {
+                          title: <span onClick={() => navigate(PATHS.home)} className="breadcrumb-clickable">Home</span>,
+                        },
+                        {
+                          title: "Create Project",
+                        },
+                      ]}
+                    />
                   </div>
                 </div>
                 <div className="scope-page-header">

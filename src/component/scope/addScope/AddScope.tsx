@@ -45,7 +45,7 @@ const AddScope = ({ open, onClose }: AddScopeProps) => {
   return (
     <Drawer
       placement="right"
-      width={480}
+      size={480}
       open={open}
       onClose={handleClose}
       closeIcon={<i className="erm-icon close-icon" />}
