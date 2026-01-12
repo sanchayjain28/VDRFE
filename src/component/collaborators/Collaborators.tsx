@@ -7,6 +7,7 @@ interface IAssignedUser {
   user_id?: string;
   user_name?: string;
   role?: string;
+  avatar?: string;
 }
 
 interface CollaboratorsProps {
@@ -34,7 +35,7 @@ const Collaborators = ({
         {collaborators?.length > 0 && (
           <Avatar.Group size="default">
             {visibleCollaborators?.map((collaborator) => (
-              <Avatar key={collaborator.user_id} src={collaborator.user_name}>
+              <Avatar key={collaborator.user_id} src={collaborator.avatar}>
                 {collaborator.user_name?.charAt(0)}
               </Avatar>
             ))}

@@ -10,6 +10,7 @@ import {
   RiskAssessment,
   Comments,
 } from "../../component";
+import type { RiskAssessmentData } from "../../component/riskAssessment/RiskAssessment";
 import "./ScopeDetails.scss";
 import ChatPanel from "../../component/chat/chatPanel/ChatPanel";
 import SelectReviewerModal from "../../component/scope/SelectReviewerModal/SelectReviewerModal";
@@ -178,13 +179,42 @@ const ScopeDetails = () => {
     setIsRiskAssessmentOpen(true);
   }, []);
 
+  const [riskAssessment, setRiskAssessment] = useState<RiskAssessmentData | null>(null);
+
   const handleCloseRiskAssessment = useCallback(() => {
     setIsRiskAssessmentOpen(false);
   }, []);
 
-  const handleAddRisk = useCallback(() => {
-    console.log("Risk Assessment Added");
+  const handleAddRisk = useCallback((data: RiskAssessmentData) => {
+    setRiskAssessment(data);
+    console.log("Risk Assessment Added:", data);
   }, []);
+
+  const handleEditRiskAssessment = useCallback(() => {
+    setIsRiskAssessmentOpen(true);
+  }, []);
+
+  const getRiskLevelColor = (level: RiskAssessmentData["riskLevel"]): string => {
+    const colorMap: Record<RiskAssessmentData["riskLevel"], string> = {
+      "very-high": "red",
+      high: "red",
+      moderate: "yellow",
+      low: "green",
+      negligible: "white",
+    };
+    return colorMap[level];
+  };
+
+  const getRiskLevelLabel = (level: RiskAssessmentData["riskLevel"]): string => {
+    const labelMap: Record<RiskAssessmentData["riskLevel"], string> = {
+      "very-high": "Very High",
+      high: "High",
+      moderate: "Moderate",
+      low: "Low",
+      negligible: "Negligible",
+    };
+    return labelMap[level];
+  };
 
   const handleRowSelectionChange = useCallback(
     (selectedRowKeys: React.Key[], selectedRows: FileData[]) => {
@@ -480,26 +510,29 @@ const ScopeDetails = () => {
                     </div>
                   </div>
                   <div className="signal-assessment-right">
-                    <div className="assessment-step-one">
-                      <h5>Risk Assessment :</h5>
-                      <Button
-                        className="secondary-btn"
-                        type="primary"
-                        shape="round"
-                        onClick={handleOpenRiskAssessment}>
-                        ADD
-                      </Button>
-                    </div>
-
-                    {/* <div className="assessment-step-two">
-                      <h5>Risk Assessment :</h5>
-                      <div className="step-two-content">
-                        <span className="signal-icon yellow"></span> Moderate
+                    {!riskAssessment ? (
+                      <div className="assessment-step-one">
+                        <h5>Risk Assessment :</h5>
+                        <Button
+                          className="secondary-btn"
+                          type="primary"
+                          shape="round"
+                          onClick={handleOpenRiskAssessment}>
+                          ADD
+                        </Button>
                       </div>
-                      <Button className="no-style" type="primary">
-                        <i className="erm-icon edit-icon" />
-                      </Button>
-                    </div> */}
+                    ) : (
+                      <div className="assessment-step-two">
+                        <h5>Risk Assessment :</h5>
+                        <div className="step-two-content">
+                          <span className={`signal-icon ${getRiskLevelColor(riskAssessment.riskLevel)}`}></span>
+                          {getRiskLevelLabel(riskAssessment.riskLevel)}
+                        </div>
+                        <Button className="no-style" type="primary" onClick={handleEditRiskAssessment}>
+                          <i className="erm-icon edit-icon" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="scope-stats">
@@ -574,6 +607,7 @@ const ScopeDetails = () => {
         open={isRiskAssessmentOpen}
         onClose={handleCloseRiskAssessment}
         onAdd={handleAddRisk}
+        initialData={riskAssessment}
       />
 
       <SelectReviewerModal

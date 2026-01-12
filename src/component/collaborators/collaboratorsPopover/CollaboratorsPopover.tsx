@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Avatar, Button, List, Popover } from "antd";
+import { Avatar, Button, Popover } from "antd";
 import "./CollaboratorsPopover.scss";
 
 // Local interface definition
@@ -7,6 +7,7 @@ interface IAssignedUser {
   user_id?: string;
   user_name?: string;
   role?: string;
+  avatar?: string;
 }
 
 interface CollaboratorsPopoverProps {
@@ -30,24 +31,23 @@ const CollaboratorsPopover = ({ collaborators, children }: CollaboratorsPopoverP
         </Button>
       </div>
       <div className="dropdown-body">
-        <List
-          dataSource={collaborators}
-          renderItem={(collaborator) => (
-            <List.Item className="collaborator-item">
-              <List.Item.Meta
-                avatar={
-                  <Avatar src={collaborator.user_name} size={32} className="collaborator-avatar">
+        <div className="collaborators-list">
+          {collaborators.map((collaborator) => (
+            <div key={collaborator.user_id} className="collaborator-item">
+              <div className="collaborator-meta">
+                <div className="collaborator-avatar-wrapper">
+                  <Avatar src={collaborator.avatar} size={32} className="collaborator-avatar">
                     {collaborator.user_name?.charAt(0)}
                   </Avatar>
-                }
-                title={<div className="collaborator-name">{collaborator.user_name}</div>}
-                description={
-                  collaborator.role && <div className="collaborator-role">{collaborator.role}</div>
-                }
-              />
-            </List.Item>
-          )}
-        />
+                </div>
+                <div className="collaborator-content">
+                  <div className="collaborator-name">{collaborator.user_name}</div>
+                  {collaborator.role && <div className="collaborator-role">{collaborator.role}</div>}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

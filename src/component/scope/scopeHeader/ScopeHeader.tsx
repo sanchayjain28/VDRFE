@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Avatar, Breadcrumb, Button, Progress } from "antd";
-import "./ScopeHeader.scss";
-import { IMAGES, PATHS } from "../../../shared";
-import { AddScopeDrawer } from "../../../component";
 import { useNavigate } from "react-router-dom";
+import { Avatar, Breadcrumb, Button, Progress } from "antd";
+import { IMAGES, PATHS } from "../../../shared";
+import AddFlagDrawer from "../addFlagDrawer/AddFlagDrawer";
+import "./ScopeHeader.scss";
 
 interface IScopeHeader {
   isScopePage: boolean;
@@ -17,18 +17,18 @@ interface IScopeHeader {
 const ScopeHeader = (props: IScopeHeader) => {
   const { isCommentsOpen, isChatOpen, onCommentsToggle, onChatToggle, onOpenReviewerModal } = props;
   const navigate = useNavigate();
-  const [isAddScopeDrawerOpen, setIsAddScopeDrawerOpen] = useState(false);
+  const [isAddFlagDrawerOpen, setIsAddFlagDrawerOpen] = useState(false);
 
-  const handleOpenAddScopeDrawer = () => {
-    setIsAddScopeDrawerOpen(true);
+  const handleOpenAddFlagDrawer = () => {
+    setIsAddFlagDrawerOpen(true);
   };
 
-  const handleCloseAddScopeDrawer = () => {
-    setIsAddScopeDrawerOpen(false);
+  const handleCloseAddFlagDrawer = () => {
+    setIsAddFlagDrawerOpen(false);
   };
 
-  const handleAddScope = (description: string) => {
-    console.log("Scope Added:", description);
+  const handleAddFlag = (description: string) => {
+    console.log("Flag Added:", description);
   };
 
   return (
@@ -61,7 +61,7 @@ const ScopeHeader = (props: IScopeHeader) => {
             type="text"
             aria-label="flagIcon"
             className={isCommentsOpen ? "active" : ""}
-            onClick={handleOpenAddScopeDrawer}>
+            onClick={handleOpenAddFlagDrawer}>
             <img src={IMAGES.flagIcon} alt="flagIcon" />
           </Button>
 
@@ -130,10 +130,10 @@ const ScopeHeader = (props: IScopeHeader) => {
         </div>
       </div>
 
-      <AddScopeDrawer
-        open={isAddScopeDrawerOpen}
-        onClose={handleCloseAddScopeDrawer}
-        onAdd={handleAddScope}
+      <AddFlagDrawer
+        open={isAddFlagDrawerOpen}
+        onClose={handleCloseAddFlagDrawer}
+        onAdd={handleAddFlag}
       />
     </div>
   );

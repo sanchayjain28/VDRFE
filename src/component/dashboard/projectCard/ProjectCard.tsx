@@ -6,6 +6,13 @@ import "./ProjectCard.scss";
 
 const { Title, Text } = Typography;
 
+export interface Collaborator {
+  id: string;
+  name: string;
+  avatar?: string;
+  role?: string;
+}
+
 export interface ProjectCardData {
   id: string;
   name: string;
@@ -22,7 +29,7 @@ export interface ProjectCardData {
     inProgress?: number;
     total: number;
   };
-  collaborators: string[];
+  collaborators: Collaborator[];
 }
 
 interface ProjectCardProps {
@@ -132,9 +139,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
 
         <Collaborators
           collaborators={project.collaborators.map((collaborator) => ({
-            user_id: collaborator,
-            user_name: collaborator.charAt(0),
-            role: "Collaborator",
+            user_id: collaborator.id,
+            user_name: collaborator.name,
+            role: collaborator.role || "Collaborator",
+            avatar: collaborator.avatar,
           }))}
         />
       </Space>

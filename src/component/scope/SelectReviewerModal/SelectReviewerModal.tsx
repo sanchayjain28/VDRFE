@@ -78,7 +78,7 @@ const SelectReviewerModal = ({ open, onClose, handleSubmit }: SelectReviewerModa
   return (
     <Modal
       className="select-reviewer-modal"
-      title="Select Reviewer"
+      title="Select Preparers"
       open={open}
       onCancel={handleModalCancel}
       footer={[
@@ -92,7 +92,7 @@ const SelectReviewerModal = ({ open, onClose, handleSubmit }: SelectReviewerModa
           shape="round"
           onClick={handleModalSubmit}
           disabled={!selectedReviewer}>
-          SUBMIT FOR REVIEW
+          ADD
         </Button>,
       ]}
       width={480}>

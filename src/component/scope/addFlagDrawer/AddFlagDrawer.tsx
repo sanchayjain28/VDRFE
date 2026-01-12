@@ -1,13 +1,12 @@
 import { Drawer, Input, Button, Form } from "antd";
-import { IMAGES } from "../../shared";
-import "./AddScopeDrawer.scss";
-interface AddScopeDrawerProps {
+import "./AddFlagDrawer.scss";
+interface AddFlagDrawerProps {
   open: boolean;
   onClose: () => void;
   onAdd?: (description: string) => void;
 }
 
-const AddScopeDrawer = ({ open, onClose }: AddScopeDrawerProps) => {
+const AddFlagDrawer = ({ open, onClose }: AddFlagDrawerProps) => {
   const handleAdd = () => {
     onClose();
   };
@@ -25,7 +24,7 @@ const AddScopeDrawer = ({ open, onClose }: AddScopeDrawerProps) => {
         <div className="drawer-header">
           <h3 className="drawer-title">
             <div className="header-icon">
-              <img src={IMAGES.addFlagIcon} alt="Add Flag" />
+              <i className="erm-icon flag-icon" />
             </div>
             Add Flag
           </h3>
@@ -64,4 +63,4 @@ const AddScopeDrawer = ({ open, onClose }: AddScopeDrawerProps) => {
   );
 };
 
-export default AddScopeDrawer;
+export default AddFlagDrawer;

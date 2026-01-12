@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, Row, Col, Statistic, Space, Typography } from "antd";
 import { RecentActivity, ProjectCard, type Activity, type ProjectCardData } from "../../component/dashboard";
-import "./Home.scss";
 import { PATHS } from "../../shared/constants";
-import { useNavigate } from "react-router-dom";
+import { IMAGES } from "../../shared";
+import "./Home.scss";
 
 const { Title, Text } = Typography;
 
@@ -25,7 +26,26 @@ const Home = () => {
       risk: "Medium Risk",
       scope: { flagged: 13, completed: 5, total: 22 },
       documents: { completed: 981, inProgress: 200, total: 1556 },
-      collaborators: ["S", "J", "M"],
+      collaborators: [
+        {
+          id: "1",
+          name: "Sarah Chen",
+          avatar: IMAGES.avatarImage,
+          role: "Project Manager",
+        },
+        {
+          id: "2",
+          name: "James Whitmore",
+          avatar: "https://i.pravatar.cc/150?img=3",
+          role: "Technical Lead",
+        },
+        {
+          id: "3",
+          name: "Michael Anderson",
+          avatar: "https://i.pravatar.cc/150?img=12",
+          role: "Analyst",
+        },
+      ],
     },
     {
       id: "2",
@@ -35,7 +55,26 @@ const Home = () => {
       risk: "High Risk",
       scope: { flagged: 3, completed: 5, total: 22 },
       documents: { completed: 981, inProgress: 200, total: 1556 },
-      collaborators: ["S", "J", "M"],
+      collaborators: [
+        {
+          id: "1",
+          name: "Sarah Chen",
+          avatar: IMAGES.avatarImage,
+          role: "Project Manager",
+        },
+        {
+          id: "2",
+          name: "James Whitmore",
+          avatar: "https://i.pravatar.cc/150?img=3",
+          role: "Technical Lead",
+        },
+        {
+          id: "3",
+          name: "Michael Anderson",
+          avatar: "https://i.pravatar.cc/150?img=12",
+          role: "Analyst",
+        },
+      ],
     },
     {
       id: "3",
@@ -45,7 +84,56 @@ const Home = () => {
       risk: "Low Risk",
       scope: { flagged: 3, completed: 5, total: 22 },
       documents: { completed: 981, inProgress: 200, total: 1556 },
-      collaborators: ["S", "J", "M", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",],
+      collaborators: [
+        {
+          id: "1",
+          name: "Sarah Chen",
+          avatar: IMAGES.avatarImage,
+          role: "Project Manager",
+        },
+        {
+          id: "2",
+          name: "James Whitmore",
+          avatar: "https://i.pravatar.cc/150?img=3",
+          role: "Technical Lead",
+        },
+        {
+          id: "3",
+          name: "Michael Anderson",
+          avatar: "https://i.pravatar.cc/150?img=12",
+          role: "Analyst",
+        },
+        {
+          id: "4",
+          name: "Emily Rodriguez",
+          avatar: "https://i.pravatar.cc/150?img=47",
+          role: "Designer",
+        },
+        {
+          id: "5",
+          name: "David Kim",
+          avatar: "https://i.pravatar.cc/150?img=33",
+          role: "Developer",
+        },
+        {
+          id: "6",
+          name: "Lisa Thompson",
+          avatar: "https://i.pravatar.cc/150?img=45",
+          role: "QA Engineer",
+        },
+        {
+          id: "7",
+          name: "Robert Martinez",
+          avatar: "https://i.pravatar.cc/150?img=15",
+          role: "Business Analyst",
+        },
+        {
+          id: "8",
+          name: "Jennifer Lee",
+          avatar: "https://i.pravatar.cc/150?img=20",
+          role: "Product Owner",
+        },
+      ],
     },
   ]);
 

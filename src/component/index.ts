@@ -3,7 +3,6 @@ import Notifications from "./header/notifications/Notifications";
 import UserProfile from "./header/userProfile/UserProfile";
 import PDFViewerDrawer from "./pdfViewerDrawer/PdfViewerDrawer";
 import RiskAssessment from "./riskAssessment";
-import AddScopeDrawer from "./addScopeDrawer";
 import SelectedSourcesDrawer from "./selectedSourcesDrawer";
 import {
   AddScope,
@@ -13,6 +12,7 @@ import {
   ScopeHeader,
   Comments,
   Chat,
+  AddFlagDrawer,
 } from "./scope";
 import { RecentActivity } from "./dashboard";
 import Collaborators from "./collaborators/Collaborators";
@@ -29,10 +29,10 @@ export {
   Comments,
   ScopeHeader,
   RiskAssessment,
-  AddScopeDrawer,
   SelectedSourcesDrawer,
   Chat,
   Collaborators,
   RecentActivity,
-  CollaboratorsPopover
+  CollaboratorsPopover,
+  AddFlagDrawer,
 };

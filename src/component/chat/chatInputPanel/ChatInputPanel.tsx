@@ -96,7 +96,9 @@ const ChatInputPanel: React.FC<ChatInputPanelProps> = ({
               variant="outlined"
               icon={<i className="erm-icon source" />}
               className="control-btn source-select-btn"
-              onClick={handleOpenSources}>
+              onClick={handleOpenSources}
+              disabled={true}
+              >
               {selectedContextIds?.project?.length === 0 &&
                 selectedContextIds?.knowledge?.length === 0
                 ? "Sources"

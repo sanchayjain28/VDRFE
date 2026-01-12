@@ -59,6 +59,22 @@
           &.very-high {
             background: #b50029;
           }
+
+          &.high {
+            background: #ff4d4f;
+          }
+
+          &.moderate {
+            background: #faad14;
+          }
+
+          &.low {
+            background: #52c41a;
+          }
+
+          &.negligible {
+            background: #d9d9d9;
+          }
         }
 
         .risk-label {
