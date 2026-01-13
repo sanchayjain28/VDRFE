@@ -1,4 +1,4 @@
-import { Input, List, Avatar, Badge, Typography } from "antd";
+import { Input, Avatar, Badge, Typography } from "antd";
 import "./RecentActivity.scss";
 
 const { Title } = Typography;
@@ -50,32 +50,29 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ activities, onSearch })
           />
         </div>
 
-        <List
-          className="activity-list"
-          dataSource={activities}
-          renderItem={(activity) => (
-            <List.Item>
-              <List.Item.Meta
-                avatar={
-                  <Badge dot={activity.isNew} offset={[-6, 8]}>
-                    <Avatar
-                      icon={<i className={`erm-icon ${getActivityIcon(activity.type)}`} />}
-                      style={{ backgroundColor: "#f5f5f5" }}
-                    />
-                  </Badge>
-                }
-                title={activity.title}
-                description={activity.subtitle}
-                className="activity-item"
-              />
+        <div className="activity-list">
+          {activities.map((activity) => (
+            <div key={activity.id} className="activity-item-wrapper">
+              <div className="activity-item">
+                <Badge dot={activity.isNew} offset={[-6, 8]}>
+                  <Avatar
+                    icon={<i className={`erm-icon ${getActivityIcon(activity.type)}`} />}
+                    style={{ backgroundColor: "#f5f5f5" }}
+                  />
+                </Badge>
+                <div className="activity-content">
+                  <div className="activity-title">{activity.title}</div>
+                  <div className="activity-description">{activity.subtitle}</div>
+                </div>
+              </div>
               {activity.isNew && (
                 <div className="new-tag">
                   NEW
                 </div>
               )}
-            </List.Item>
-          )}
-        />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -6,6 +6,13 @@ import "./ProjectCard.scss";
 
 const { Title, Text } = Typography;
 
+export interface Collaborator {
+  id: string;
+  name: string;
+  avatar?: string;
+  role?: string;
+}
+
 export interface ProjectCardData {
   id: string;
   name: string;
@@ -22,7 +29,7 @@ export interface ProjectCardData {
     inProgress?: number;
     total: number;
   };
-  collaborators: string[];
+  collaborators: Collaborator[];
 }
 
 interface ProjectCardProps {
@@ -43,7 +50,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
 
   return (
     <Card className="project-card" onClick={handleCardClick}>
-      <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+      <Space orientation="vertical" size="middle" style={{ width: "100%" }}>
         <Row justify="space-between" align="middle">
           <Col>
             <Title level={5} style={{ margin: 0 }}>
@@ -78,7 +85,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                 {project.scope.flagged > 0 && (
                   <div className="scope-tag">
                     <i className="erm-icon flag-icon" />
-                    <Divider type="vertical" style={{ height: "14px" }} />
+                    <Divider orientation="vertical" style={{ height: "14px" }} />
                     <span className="scope-tag-text">{project.scope.flagged}</span>
                   </div>
                 )}
@@ -97,7 +104,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                 showInfo={false}
                 strokeLinecap="round"
                 className="progress-bar scope-progress"
-                strokeWidth={6}
+
               />
             </Tooltip>
           </div>
@@ -125,7 +132,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                 showInfo={false}
                 strokeLinecap="round"
                 className="progress-bar docs-progress"
-                strokeWidth={6}
               />
             </Tooltip>
           </div>
@@ -133,9 +139,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
 
         <Collaborators
           collaborators={project.collaborators.map((collaborator) => ({
-            user_id: collaborator,
-            user_name: collaborator.charAt(0),
-            role: "Collaborator",
+            user_id: collaborator.id,
+            user_name: collaborator.name,
+            role: collaborator.role || "Collaborator",
+            avatar: collaborator.avatar,
           }))}
         />
       </Space>

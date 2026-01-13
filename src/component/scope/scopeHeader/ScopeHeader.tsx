@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Avatar, Breadcrumb, Button, Progress } from "antd";
-import "./ScopeHeader.scss";
-import { IMAGES, PATHS } from "../../../shared";
-import { AddScopeDrawer } from "../../../component";
 import { useNavigate } from "react-router-dom";
+import { Avatar, Breadcrumb, Button, Progress } from "antd";
+import { IMAGES, PATHS } from "../../../shared";
+import AddFlagDrawer from "../addFlagDrawer/AddFlagDrawer";
+import "./ScopeHeader.scss";
 
 interface IScopeHeader {
   isScopePage: boolean;
@@ -17,28 +17,35 @@ interface IScopeHeader {
 const ScopeHeader = (props: IScopeHeader) => {
   const { isCommentsOpen, isChatOpen, onCommentsToggle, onChatToggle, onOpenReviewerModal } = props;
   const navigate = useNavigate();
-  const [isAddScopeDrawerOpen, setIsAddScopeDrawerOpen] = useState(false);
+  const [isAddFlagDrawerOpen, setIsAddFlagDrawerOpen] = useState(false);
 
-  const handleOpenAddScopeDrawer = () => {
-    setIsAddScopeDrawerOpen(true);
+  const handleOpenAddFlagDrawer = () => {
+    setIsAddFlagDrawerOpen(true);
   };
 
-  const handleCloseAddScopeDrawer = () => {
-    setIsAddScopeDrawerOpen(false);
+  const handleCloseAddFlagDrawer = () => {
+    setIsAddFlagDrawerOpen(false);
   };
 
-  const handleAddScope = (description: string) => {
-    console.log("Scope Added:", description);
+  const handleAddFlag = (description: string) => {
+    console.log("Flag Added:", description);
   };
 
   return (
     <div className="scope-header-wrapper">
       <div className="scope-header">
         <div className="breadcrumb-wrapper">
-          <Breadcrumb className="page-breadcrumb">
-            <Breadcrumb.Item onClick={() => navigate(PATHS.home)} className="breadcrumb-clickable">Home</Breadcrumb.Item>
-            <Breadcrumb.Item onClick={() => navigate(PATHS.projectDetails)} className="breadcrumb-clickable">Shell - Air Quality</Breadcrumb.Item>
-          </Breadcrumb>
+          <Breadcrumb 
+            className="page-breadcrumb"
+            items={[
+              {
+                title: <span onClick={() => navigate(PATHS.home)} className="breadcrumb-clickable">Home</span>,
+              },
+              {
+                title: <span onClick={() => navigate(PATHS.projectDetails)} className="breadcrumb-clickable">Shell - Air Quality</span>,
+              },
+            ]}
+          />
         </div>
 
         <div className="scope-actions">
@@ -54,7 +61,7 @@ const ScopeHeader = (props: IScopeHeader) => {
             type="text"
             aria-label="flagIcon"
             className={isCommentsOpen ? "active" : ""}
-            onClick={handleOpenAddScopeDrawer}>
+            onClick={handleOpenAddFlagDrawer}>
             <img src={IMAGES.flagIcon} alt="flagIcon" />
           </Button>
 
@@ -123,10 +130,10 @@ const ScopeHeader = (props: IScopeHeader) => {
         </div>
       </div>
 
-      <AddScopeDrawer
-        open={isAddScopeDrawerOpen}
-        onClose={handleCloseAddScopeDrawer}
-        onAdd={handleAddScope}
+      <AddFlagDrawer
+        open={isAddFlagDrawerOpen}
+        onClose={handleCloseAddFlagDrawer}
+        onAdd={handleAddFlag}
       />
     </div>
   );

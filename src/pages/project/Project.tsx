@@ -20,7 +20,26 @@ const Project = () => {
       risk: "Medium Risk",
       scope: { flagged: 13, completed: 5, total: 22 },
       documents: { completed: 981, inProgress: 200, total: 1556 },
-      collaborators: ["S", "J", "M"],
+      collaborators: [
+        {
+          id: "1",
+          name: "Sarah Chen",
+          avatar: "https://i.pravatar.cc/150?img=1",
+          role: "Project Manager",
+        },
+        {
+          id: "2",
+          name: "James Whitmore",
+          avatar: "https://i.pravatar.cc/150?img=2",
+          role: "Technical Lead",
+        },
+        {
+          id: "3",
+          name: "Michael Anderson",
+          avatar: "https://i.pravatar.cc/150?img=3",
+          role: "Analyst",
+        },
+      ],
     },
     {
       id: "2",
@@ -30,7 +49,26 @@ const Project = () => {
       risk: "High Risk",
       scope: { flagged: 3, completed: 5, total: 22 },
       documents: { completed: 981, inProgress: 200, total: 1556 },
-      collaborators: ["S", "J", "M"],
+      collaborators: [
+        {
+          id: "1",
+          name: "Sarah Chen",
+          avatar: "https://i.pravatar.cc/150?img=1",
+          role: "Project Manager",
+        },
+        {
+          id: "2",
+          name: "James Whitmore",
+          avatar: "https://i.pravatar.cc/150?img=2",
+          role: "Technical Lead",
+        },
+        {
+          id: "3",
+          name: "Michael Anderson",
+          avatar: "https://i.pravatar.cc/150?img=3",
+          role: "Analyst",
+        },
+      ],
     },
     {
       id: "3",
@@ -40,7 +78,26 @@ const Project = () => {
       risk: "Low Risk",
       scope: { flagged: 3, completed: 5, total: 22 },
       documents: { completed: 981, inProgress: 200, total: 1556 },
-      collaborators: ["S", "J", "M", "A", "B", "C"],
+      collaborators: [
+        {
+          id: "1",
+          name: "Sarah Chen",
+          avatar: "https://i.pravatar.cc/150?img=1",
+          role: "Project Manager",
+        },
+        {
+          id: "2",
+          name: "James Whitmore",
+          avatar: "https://i.pravatar.cc/150?img=2",
+          role: "Technical Lead",
+        },
+        {
+          id: "3",
+          name: "Michael Anderson",
+          avatar: "https://i.pravatar.cc/150?img=3",
+          role: "Analyst",
+        },
+      ]
     },
     {
       id: "4",
@@ -50,7 +107,26 @@ const Project = () => {
       risk: "Low Risk",
       scope: { flagged: 3, completed: 5, total: 22 },
       documents: { completed: 981, inProgress: 200, total: 1556 },
-      collaborators: ["S", "J", "M", "A", "B", "C"],
+      collaborators: [
+        {
+          id: "1",
+          name: "Sarah Chen",
+          avatar: "https://i.pravatar.cc/150?img=1",
+          role: "Project Manager",
+        },
+        {
+          id: "2",
+          name: "James Whitmore",
+          avatar: "https://i.pravatar.cc/150?img=2",
+          role: "Technical Lead",
+        },
+        {
+          id: "3",
+          name: "Michael Anderson",
+          avatar: "https://i.pravatar.cc/150?img=3",
+          role: "Analyst",
+        },
+      ],
     },
   ]);
 

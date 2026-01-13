@@ -94,8 +94,8 @@
             }
         }
 
-        .ant-list {
-            .ant-list-item {
+        .collaborators-list {
+            .collaborator-item {
                 padding: 8px 10px;
                 border-bottom: none;
                 cursor: default;
@@ -105,11 +105,13 @@
                     background: #f6f9f6;
                 }
 
-                .ant-list-item-meta {
+                .collaborator-meta {
+                    display: flex;
                     align-items: center;
 
-                    .ant-list-item-meta-avatar {
+                    .collaborator-avatar-wrapper {
                         margin-right: 12px;
+                        flex-shrink: 0;
 
                         .ant-avatar {
                             width: 32px !important;
@@ -117,10 +119,9 @@
                         }
                     }
 
-                    .ant-list-item-meta-content {
-                        .ant-list-item-meta-title {
-                            margin-bottom: 0px;
-                        }
+                    .collaborator-content {
+                        flex: 1;
+                        min-width: 0;
 
                         .collaborator-name {
                             font-size: 13px;
@@ -133,6 +134,7 @@
                             font-size: 11px;
                             color: var(--primary);
                             opacity: 0.6;
+                            margin-top: 2px;
                         }
                     }
                 }

@@ -29,6 +29,8 @@
 
       .ant-avatar {
         border: 2px solid var(--white);
+        background: var(--primary);
+        color: var(--white);
         cursor: pointer;
         transition: transform 0.2s;
 

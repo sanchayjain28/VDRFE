@@ -35,7 +35,7 @@ const Header = () => {
       <div className="header-center">
         <Flex align="center" gap="25px" className="header-center-links">
           <Link to={PATHS.home}>Home</Link>
-          <Link to={PATHS.projects}>My Projects</Link>
+          {/* <Link to={PATHS.projects}>My Projects</Link> */}
         </Flex>
       </div>
 

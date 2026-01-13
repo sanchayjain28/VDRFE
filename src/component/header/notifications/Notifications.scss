@@ -98,8 +98,8 @@
 }
 
 .notification-avatar.fallback {
-  background: #019a20;
-  color: #fff;
+  background: var(--primary);
+  color: var(--white);
   font-weight: 500;
   font-size: 15px;
   display: flex;

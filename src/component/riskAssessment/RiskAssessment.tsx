@@ -1,22 +1,133 @@
+import { useState, useEffect } from "react";
 import { Button, Modal, Select } from "antd";
 import "./RiskAssessment.scss";
+
+export type Severity = "low" | "moderate" | "high" | "critical";
+export type Likelihood = "rare" | "unlikely" | "possible" | "likely" | "certain";
+export type RiskLevel = "very-high" | "high" | "moderate" | "low" | "negligible";
+
+export interface RiskAssessmentData {
+  severity: Severity;
+  likelihood: Likelihood;
+  riskLevel: RiskLevel;
+  description: string;
+}
 
 interface RiskAssessmentProps {
   open: boolean;
   onClose: () => void;
-  onAdd?: () => void;
+  onAdd?: (data: RiskAssessmentData) => void;
+  initialData?: RiskAssessmentData | null;
 }
 
-const RiskAssessment = ({ open, onClose, onAdd }: RiskAssessmentProps) => {
+// Risk calculation matrix: [severity][likelihood] => risk level
+const RISK_MATRIX: Record<Severity, Record<Likelihood, RiskLevel>> = {
+  critical: {
+    rare: "high",
+    unlikely: "very-high",
+    possible: "very-high",
+    likely: "very-high",
+    certain: "very-high",
+  },
+  high: {
+    rare: "moderate",
+    unlikely: "high",
+    possible: "very-high",
+    likely: "very-high",
+    certain: "very-high",
+  },
+  moderate: {
+    rare: "low",
+    unlikely: "moderate",
+    possible: "high",
+    likely: "high",
+    certain: "very-high",
+  },
+  low: {
+    rare: "negligible",
+    unlikely: "low",
+    possible: "moderate",
+    likely: "moderate",
+    certain: "high",
+  },
+};
+
+// Risk descriptions
+const RISK_DESCRIPTIONS: Record<RiskLevel, string> = {
+  "very-high": "Material costs will be borne by Gull and/or a potential acquirer. Immediate action required.",
+  high: "Significant impact expected. Requires close monitoring and mitigation strategies.",
+  moderate: "Moderate impact anticipated. Standard monitoring and controls should be sufficient.",
+  low: "Low impact expected. Minimal intervention required.",
+  negligible: "Negligible impact. No action required.",
+};
+
+const RiskAssessment = ({ open, onClose, onAdd, initialData }: RiskAssessmentProps) => {
+  const [severity, setSeverity] = useState<Severity>(initialData?.severity || "moderate");
+  const [likelihood, setLikelihood] = useState<Likelihood>(initialData?.likelihood || "possible");
+  const [riskLevel, setRiskLevel] = useState<RiskLevel>("moderate");
+  const [description, setDescription] = useState<string>("");
+
+  // Calculate risk level when severity or likelihood changes
+  useEffect(() => {
+    if (severity && likelihood) {
+      const calculatedRisk = RISK_MATRIX[severity][likelihood];
+      setRiskLevel(calculatedRisk);
+      setDescription(RISK_DESCRIPTIONS[calculatedRisk]);
+    }
+  }, [severity, likelihood]);
+
+  // Reset form when modal opens/closes or initialData changes
+  useEffect(() => {
+    if (open) {
+      if (initialData) {
+        setSeverity(initialData.severity);
+        setLikelihood(initialData.likelihood);
+        setRiskLevel(initialData.riskLevel);
+        setDescription(initialData.description);
+      } else {
+        setSeverity("moderate");
+        setLikelihood("possible");
+        const defaultRisk = RISK_MATRIX["moderate"]["possible"];
+        setRiskLevel(defaultRisk);
+        setDescription(RISK_DESCRIPTIONS[defaultRisk]);
+      }
+    }
+  }, [open, initialData]);
+
   const handleAdd = () => {
-    onAdd?.();
+    const riskData: RiskAssessmentData = {
+      severity,
+      likelihood,
+      riskLevel,
+      description,
+    };
+    onAdd?.(riskData);
     onClose();
+  };
+
+  const handleCancel = () => {
+    onClose();
+  };
+
+  const getRiskLevelLabel = (level: RiskLevel): string => {
+    const labels: Record<RiskLevel, string> = {
+      "very-high": "Very High",
+      high: "High",
+      moderate: "Moderate",
+      low: "Low",
+      negligible: "Negligible",
+    };
+    return labels[level];
+  };
+
+  const getRiskDotClass = (level: RiskLevel): string => {
+    return `risk-dot ${level}`;
   };
 
   return (
     <Modal
       open={open}
-      onCancel={onClose}
+      onCancel={handleCancel}
       footer={null}
       closable={true}
       className="risk-assessment-modal"
@@ -30,7 +141,8 @@ const RiskAssessment = ({ open, onClose, onAdd }: RiskAssessmentProps) => {
             <div className="form-field">
               <label className="field-label">Severity</label>
               <Select
-                defaultValue="moderate"
+                value={severity}
+                onChange={(value) => setSeverity(value as Severity)}
                 className="dropdown-ui"
                 suffixIcon={
                   <>
@@ -48,7 +160,8 @@ const RiskAssessment = ({ open, onClose, onAdd }: RiskAssessmentProps) => {
             <div className="form-field">
               <label className="field-label">Likelihood</label>
               <Select
-                defaultValue="possible"
+                value={likelihood}
+                onChange={(value) => setLikelihood(value as Likelihood)}
                 className="dropdown-ui"
                 suffixIcon={
                   <>
@@ -67,21 +180,19 @@ const RiskAssessment = ({ open, onClose, onAdd }: RiskAssessmentProps) => {
 
           <div className="risk-indicator-box">
             <div className="risk-indicator">
-              <span className="risk-dot very-high"></span>
-              <span className="risk-label">Very High :</span>
+              <span className={getRiskDotClass(riskLevel)}></span>
+              <span className="risk-label">{getRiskLevelLabel(riskLevel)} :</span>
             </div>
-            <p className="risk-description">
-              Material costs will be borne by Gull and/or a potential acquirer.
-            </p>
+            <p className="risk-description">{description}</p>
           </div>
         </div>
 
         <div className="risk-assessment-footer">
-          <Button className="secondary-btn" shape="round" onClick={onClose}>
+          <Button className="secondary-btn" shape="round" onClick={handleCancel}>
             CANCEL
           </Button>
           <Button className="primary-btn" shape="round" onClick={handleAdd}>
-            ADD
+            {initialData ? "UPDATE" : "ADD"}
           </Button>
         </div>
       </div>

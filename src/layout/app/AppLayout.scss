@@ -27,8 +27,8 @@
 }
 
 .ant-avatar {
-  background: linear-gradient(0deg, #019a20, #019a20),
-    linear-gradient(0deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2));
+  background: var(--primary);
+  color: var(--white);
 }
 
 @media (max-width: 768px) {
