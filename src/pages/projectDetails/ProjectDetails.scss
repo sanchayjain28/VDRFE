@@ -63,7 +63,7 @@
         .ant-breadcrumb-link {
           border: 0.8px solid #D3DFD44D;
           background: #D3DFD447;
-          color: #019A20;      
+          color: #019A20;
           padding: 4px 8px;
           border-radius: 37px;
           font-size: 12px;
@@ -86,6 +86,7 @@
 
     .recent-activity-wrap {
       min-width: 330px;
+      max-width: 25%;
     }
 
     .project-table-matrix-wrap {

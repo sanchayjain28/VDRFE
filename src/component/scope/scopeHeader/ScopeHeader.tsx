@@ -28,7 +28,7 @@ const ScopeHeader = (props: IScopeHeader) => {
   };
 
   const handleAddFlag = (description: string) => {
-    console.log("Flag Added:", description);
+    description
   };
 
   return (
