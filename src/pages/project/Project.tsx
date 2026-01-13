@@ -162,7 +162,7 @@ const Project = () => {
         currentPage={1}
         pageSize={10}
         total={50}
-        handlePagination={(page) => console.log(page)}
+        handlePagination={(page) => page}
         isHidePagination={false}
       />
     </div>

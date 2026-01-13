@@ -231,7 +231,7 @@ const ProjectDetails = () => {
     <div className="project-details-page-container">
       <div className="project-details-header">
         <div className="project-details-header-text-wrap">
-          <span>shell</span>
+          <span>Shell</span>
           <p>
             Shell is a global energy company operating across exploration,
             production, refining, and low-carbon solutions. With a presence in

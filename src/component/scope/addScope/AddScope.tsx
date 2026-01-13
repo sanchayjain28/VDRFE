@@ -27,7 +27,7 @@ const AddScope = ({ open, onClose }: AddScopeProps) => {
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      console.log("Form values:", values);
+      values
       // TODO: Add API call to submit the form
       message.success("Scope added successfully!");
       form.resetFields();

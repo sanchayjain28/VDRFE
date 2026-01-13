@@ -187,7 +187,6 @@ const ScopeDetails = () => {
 
   const handleAddRisk = useCallback((data: RiskAssessmentData) => {
     setRiskAssessment(data);
-    console.log("Risk Assessment Added:", data);
   }, []);
 
   const handleEditRiskAssessment = useCallback(() => {
@@ -218,8 +217,8 @@ const ScopeDetails = () => {
 
   const handleRowSelectionChange = useCallback(
     (selectedRowKeys: React.Key[], selectedRows: FileData[]) => {
-      console.log("Selected Row Keys:", selectedRowKeys);
-      console.log("Selected Rows:", selectedRows);
+      selectedRowKeys
+      selectedRows
     },
     []
   );
@@ -469,7 +468,7 @@ const ScopeDetails = () => {
   );
 
   const handleSubmitReviewer = (reviewer: any) => {
-    console.log("Selected Reviewer:", reviewer);
+    reviewer
     setIsReviewerModalOpen(false);
   };
 

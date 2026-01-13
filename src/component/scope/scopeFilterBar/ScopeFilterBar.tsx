@@ -15,7 +15,7 @@ const ScopeFilterBar = ({ isScopePage }: { isScopePage?: boolean }) => {
   };
 
   const handleSelectSources = (selectedItems: any[]) => {
-    console.log("Selected Sources:", selectedItems);
+    selectedItems
   };
 
   return (

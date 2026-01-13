@@ -67,7 +67,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   }, []);
 
   const onOpenCitation = useCallback((c?: ICitation) => {
-    console.log(c);
+    c
   }, []);
 
   const onFeedbackOpen = useCallback(() => {
