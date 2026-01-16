@@ -24,10 +24,18 @@ const PRE_PROD_CONFIG: IConfig = {
   HOST: hostname,
 };
 
+// d2i5t39cxos381.cloudfront.net - cloudfront_Config
+const CLOUDFRONT_CONFIG: IConfig = {
+  BASE_URL: "https://d2i5t39cxos381.cloudfront.net/",
+  USER_BASE_URL: "https://d2i5t39cxos381.cloudfront.net/",
+  HOST: hostname,
+};
+
 const configs: IConfig = (() => {
   if (hostname === "localhost") return LOCALHOST_CONFIG;
   if (hostname === "dev") return DEV_CONFIG;
   if (hostname === "prod") return PRE_PROD_CONFIG;
+  if (hostname === "d2i5t39cxos381.cloudfront.net") return CLOUDFRONT_CONFIG;
   throw new Error(`Unknown hostname: ${hostname}`);
 })();
 
