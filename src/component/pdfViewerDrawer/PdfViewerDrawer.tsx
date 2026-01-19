@@ -1,11 +1,7 @@
 import React, { useState } from "react";
-import { Drawer, Button } from "antd";
+import { Drawer, Button, Input, Space, Typography } from "antd";
 import { Document, Page, pdfjs } from "react-pdf";
-import {
-  LeftOutlined,
-  RightOutlined,
-  FullscreenExitOutlined,
-} from "@ant-design/icons";
+import { LeftOutlined, RightOutlined, FullscreenExitOutlined } from "@ant-design/icons";
 import { IMAGES } from "../../shared";
 import "./PdfViewerDrawer.scss";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -25,6 +21,9 @@ interface PdfViewerDrawerProps {
   summaryContent?: React.ReactNode;
 }
 
+const { TextArea } = Input;
+const { Title } = Typography;
+
 const PdfViewerDrawer: React.FC<PdfViewerDrawerProps> = ({
   open,
   onClose,
@@ -32,7 +31,7 @@ const PdfViewerDrawer: React.FC<PdfViewerDrawerProps> = ({
   title = "PDF Viewer",
   onApprove,
   onCancel,
-  showActions = false,
+  // showActions = false,
   summaryContent,
 }) => {
   const [numPages, setNumPages] = useState<number>(0);
@@ -82,14 +81,9 @@ const PdfViewerDrawer: React.FC<PdfViewerDrawerProps> = ({
       width="70%"
       className="pdf-viewer-drawer"
       styles={{ header: { display: "none" }, body: { padding: 0 } }}
-      footer={null}
-    >
+      footer={null}>
       <div className="pdf-viewer-container">
-        <div
-          className={`pdf-content-wrapper ${
-            isFullscreen ? "fullscreen-mode" : ""
-          }`}
-        >
+        <div className={`pdf-content-wrapper ${isFullscreen ? "fullscreen-mode" : ""}`}>
           <div className="pdf-document-section">
             <div className="pdf-toolbar">
               <div className="pdf-zoom-controls">
@@ -144,37 +138,13 @@ const PdfViewerDrawer: React.FC<PdfViewerDrawerProps> = ({
                 file={pdfUrl}
                 onLoadSuccess={onDocumentLoadSuccess}
                 loading={<div className="pdf-loading">Loading PDF...</div>}
-                error={<div className="pdf-error">Failed to load PDF</div>}
-              >
+                error={<div className="pdf-error">Failed to load PDF</div>}>
                 <Page
                   pageNumber={pageNumber}
                   scale={scale}
                   width={isFullscreen ? undefined : 550}
                 />
               </Document>
-            </div>
-            <div className="pdf-drawer-footer">
-              {showActions && (
-                <>
-                  <Button
-                    className="secondary-btn"
-                    size="large"
-                    shape="round"
-                    onClick={handleCancel}
-                  >
-                    CANCEL
-                  </Button>
-                  <Button
-                    className="primary-btn"
-                    type="primary"
-                    size="large"
-                    shape="round"
-                    onClick={handleApprove}
-                  >
-                    APPROVE
-                  </Button>
-                </>
-              )}
             </div>
           </div>
           <div className="pdf-summary-section">
@@ -210,19 +180,57 @@ const PdfViewerDrawer: React.FC<PdfViewerDrawerProps> = ({
               {summaryContent || (
                 <div>
                   <p>
-                    Lorem Ipsum is simply dummy text of the printing and
-                    typesetting industry. Lorem Ipsum has been the industry's
-                    standard dummy text ever since the 1500s, when an unknown
-                    printer took a galley of type and scrambled it to make a
-                    type specimen book. It has survived not only five centuries,
-                    but also the leap into electronic typesetting, remaining
-                    essentially unchanged. It was popularised in the 1960s with
-                    the release of Letraset sheets containing Lorem Ipsum
-                    passages, and more recently with desktop publishing software
-                    like Aldus PageMaker including versions of Lorem Ipsum.
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
+                    Ipsum has been the industry's standard dummy text ever since the 1500s, when an
+                    unknown printer took a galley of type and scrambled it to make a type specimen
+                    book. It has survived not only five centuries, but also the leap into electronic
+                    typesetting, remaining essentially unchanged. It was popularised in the 1960s
+                    with the release of Letraset sheets containing Lorem Ipsum passages, and more
+                    recently with desktop publishing software like Aldus PageMaker including
+                    versions of Lorem Ipsum.
                   </p>
                 </div>
               )}
+            </div>
+
+            <div className="observation-section">
+              <Title level={5}>Observation</Title>
+
+              <TextArea
+                className="textarea"
+                placeholder="Enter your observation here..."
+                rows={3}
+              />
+
+              {/* Clear / Add */}
+              <div className="observation-actions">
+                <Space>
+                  <Button className="no-style" type="link">
+                    CLEAR
+                  </Button>
+                  <Button className="no-style" type="link">
+                    ADD
+                  </Button>
+                </Space>
+              </div>
+            </div>
+
+            <div className="pdf-drawer-footer">
+              {/* {showActions && ( */}
+              <>
+                <Button className="secondary-btn" size="large" shape="round" onClick={handleCancel}>
+                  REJECT
+                </Button>
+                <Button
+                  className="primary-btn"
+                  type="primary"
+                  size="large"
+                  shape="round"
+                  onClick={handleApprove}>
+                  APPROVE
+                </Button>
+              </>
+              {/* )} */}
             </div>
           </div>
         </div>
