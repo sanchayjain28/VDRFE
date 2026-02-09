@@ -1,174 +1,127 @@
-name: Deploy S3 + CF
+name: "deploy vdr-frontend on EKS"
 
 on:
-  push:
-    branches:
-      - dev
-      - qa
-      - main
-  pull_request:
-    types: [opened, synchronize, reopened]
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy to'
+        description: "Select environment"
         required: true
         type: choice
         options:
           - dev
+          - uat
           - qa
           - prod
-          - shared
+        default: "dev"
 
+      project:
+        description: "Name of the project to deploy"
+        required: true
+        default: "vdr"
+
+      service:
+        description: "Name of the service to deploy"
+        required: true
+        default: "vdr-frontend"
+
+permissions:
+  id-token: write     # REQUIRED for OIDC
+  contents: read      # Needed to checkout code
 
 jobs:
-  security:
-    name: Security — CodeQL SAST + Dependency Review (SCA)
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
-
-    permissions:
-      contents: read
-      security-events: write
-      actions: read
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4
-        with:
-          languages: javascript, typescript, actions
-          queries: security-extended
-
-      - name: Autobuild (CodeQL)
-        uses: github/codeql-action/autobuild@v4
-
-      - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@v4
-
-      - name: Dependency review (SCA)
-        uses: actions/dependency-review-action@v4.8.2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-
-  deploy:
-    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-    runs-on: vdr-frontend
-
-    permissions:
-      id-token: write
-      contents: read
-      actions: read
-
+  deployEks:
+    runs-on: [vdr-frontend]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - run: npm ci
-      - run: npm run build
-
-      # Determine environment based on trigger type
-      - name: Set environment
-        id: set_env
+      - name: Set AWS Account ID based on environment
+        id: account_map
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "DEPLOY_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+          echo "AWS_REGION=us-east-1" >> $GITHUB_ENV
+          if [[ "${{ github.event.inputs.environment }}" == "shared" ]]; then
+            echo "AWS_ACCOUNT_ID=364819544347" >> $GITHUB_ENV
+          elif [[ "${{ github.event.inputs.environment }}" == "dev" ]]; then
+            echo "AWS_ACCOUNT_ID=442168705691" >> $GITHUB_ENV
+          elif [[ "${{ github.event.inputs.environment }}" == "uat" ]]; then
+            echo "AWS_ACCOUNT_ID=442168705691" >> $GITHUB_ENV
+          elif [[ "${{ github.event.inputs.environment }}" == "qa" ]]; then
+            echo "AWS_ACCOUNT_ID=123456789012" >> $GITHUB_ENV
+          elif [[ "${{ github.event.inputs.environment }}" == "prod" ]]; then
+            echo "AWS_ACCOUNT_ID=987654321098" >> $GITHUB_ENV
           else
-            # Auto-detect based on branch
-            if [[ "${{ github.ref }}" == "refs/heads/dev" ]] || [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
-              echo "DEPLOY_ENV=dev" >> $GITHUB_ENV
-            elif [[ "${{ github.ref }}" == "refs/heads/qa" ]]; then
-              echo "DEPLOY_ENV=qa" >> $GITHUB_ENV
-            elif [[ "${{ github.ref }}" == "refs/heads/main" ]] || [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-              echo "DEPLOY_ENV=prod" >> $GITHUB_ENV
-            else
-              echo "DEPLOY_ENV=dev" >> $GITHUB_ENV
-            fi
+            echo "Invalid environment"
+            exit 1
           fi
 
-      # Map environment to AWS resources
-      - name: Set AWS Account ID and resources based on environment
-        run: |
-          case "${{ env.DEPLOY_ENV }}" in
-            shared)
-              echo "AWS_ACCOUNT_ID=621766907350" >> $GITHUB_ENV
-              echo "S3_BUCKET=erm-shared-frontend" >> $GITHUB_ENV
-              echo "CF_DIST=EXXXXXXXXXX" >> $GITHUB_ENV
-              echo "AWS_REGION=us-east-1" >> $GITHUB_ENV
-              ;;
-            dev)
-              echo "AWS_ACCOUNT_ID=442168705691" >> $GITHUB_ENV
-              echo "S3_BUCKET=erm-vdr-web" >> $GITHUB_ENV
-              echo "CF_DIST=E2D748M8ELVJVY" >> $GITHUB_ENV
-              echo "AWS_REGION=us-east-1" >> $GITHUB_ENV
-              ;;
-            qa)
-              echo "AWS_ACCOUNT_ID=123456789012" >> $GITHUB_ENV
-              echo "S3_BUCKET=erm-qa-frontend" >> $GITHUB_ENV
-              echo "CF_DIST=EXXXXXXXXXX" >> $GITHUB_ENV
-              echo "AWS_REGION=us-east-1" >> $GITHUB_ENV
-              ;;
-            prod)
-              echo "AWS_ACCOUNT_ID=987654321098" >> $GITHUB_ENV
-              echo "S3_BUCKET=erm-prod-frontend" >> $GITHUB_ENV
-              echo "CF_DIST=EXXXXXXXXXX" >> $GITHUB_ENV
-              echo "AWS_REGION=us-east-1" >> $GITHUB_ENV
-              ;;
-            *)
-              echo "Invalid environment: ${{ env.DEPLOY_ENV }}"
-              exit 1
-              ;;
-          esac
-
-      # Assume AWS Role (same method as Terraform workflow)
       - name: Assume AWS Role Based on Environment
         run: |
           ROLE_ARN="arn:aws:iam::${AWS_ACCOUNT_ID}:role/common-erm-assumable-role"
+
           CREDS=$(aws sts assume-role \
             --role-arn "$ROLE_ARN" \
             --role-session-name github-actions-session)
+
           echo "AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r '.Credentials.AccessKeyId')" >> $GITHUB_ENV
           echo "AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r '.Credentials.SecretAccessKey')" >> $GITHUB_ENV
           echo "AWS_SESSION_TOKEN=$(echo $CREDS | jq -r '.Credentials.SessionToken')" >> $GITHUB_ENV
 
-      - name: Upload to S3
-        run: |
-          echo "Deploying to ${{ env.DEPLOY_ENV }} environment..."
-          echo "S3 Bucket: ${{ env.S3_BUCKET }}"
-          aws s3 sync ./dist s3://${{ env.S3_BUCKET }}/dist/ --delete
-          echo "Files uploaded successfully"
+      - name: Set outputs
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-      - name: Invalidate CloudFront
-        run: |
-          echo "Invalidating CloudFront cache..."
-          echo "Distribution: ${{ env.CF_DIST }}"
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ env.CF_DIST }} \
-            --paths "/*"
-          echo "CloudFront invalidation created"
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Deployment Summary
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            image=moby/buildkit:v0.12.0
+          install: true
+
+      - name: Build and Push with Buildx ECR Cache
+        env:
+          ECR_REGISTRY: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+          ECR_REPOSITORY: ${{ inputs.environment }}-${{ inputs.service }}
+          IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
         run: |
-          echo "================================"
-          echo "Deployment Completed!"
-          echo "================================"
-          echo "Environment: ${{ env.DEPLOY_ENV }}"
-          echo "Branch: ${{ github.ref_name }}"
-          echo "Commit: ${{ github.sha }}"
-          echo "S3 Bucket: ${{ env.S3_BUCKET }}"
-          echo "CloudFront Distribution: ${{ env.CF_DIST }}"
-          echo "================================"
+          echo "Building ${{ inputs.environment }} image with Docker Buildx and ECR cache..."
+          
+          # Build with proper cache import/export using buildx
+          docker buildx build \
+            --cache-from type=registry,ref=$ECR_REGISTRY/$ECR_REPOSITORY:buildcache \
+            --cache-to type=registry,ref=$ECR_REGISTRY/$ECR_REPOSITORY:buildcache,mode=max,image-manifest=true,oci-mediatypes=true \
+            --tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            --tag $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            --push \
+            --provenance false \
+            .
+          
+          echo "Build complete with cache!"
+          echo "Image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "Environment: ${{ inputs.environment }}"
+          echo "Cache: $ECR_REGISTRY/$ECR_REPOSITORY:buildcache"
+
+      - name: Set current date as env variable
+        run: echo "NOW=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+        
+
+      - name: Performing the helm deploy
+        env:
+          ECR_REGISTRY: ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+          ECR_REPOSITORY: ${{ inputs.environment }}-${{ inputs.service }}
+          IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
+          HOST_URL: ${{ inputs.environment == 'prod' && 'vdr.ermtools.app' || inputs.environment == 'uat' && 'erm-vdr-uat.app' || 'erm-vdr-dev.ermtools.app' }}
+        run: |
+          aws eks update-kubeconfig --name dev-erm-eks-manual --region us-east-1
+          certArn=$(aws acm list-certificates --query "CertificateSummaryList[?DomainName=='*.ermtools.app'].CertificateArn" --output text)
+          helm upgrade --install -n ${{ inputs.environment }} --create-namespace \
+          --set image.repository=$ECR_REGISTRY/$ECR_REPOSITORY \
+          --set image.tag=$IMAGE_TAG \
+          --set environment=${{ inputs.environment }} \
+          --set ingress.hosts[0].host=$HOST_URL \
+          --set ingress.annotations.'alb\.ingress\.kubernetes\.io/certificate-arn'=$certArn \
+          --set ingress.annotations.'alb\.ingress\.kubernetes\.io/load-balancer-name'=${{ inputs.environment }}-erm-alb \
+          -f helm/${{ inputs.service }}/values.yaml ${{ inputs.service }} helm/${{ inputs.service }}/
