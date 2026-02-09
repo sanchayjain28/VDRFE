@@ -14,6 +14,7 @@ import type { RiskAssessmentData } from "../../component/riskAssessment/RiskAsse
 import "./ScopeDetails.scss";
 import ChatPanel from "../../component/chat/chatPanel/ChatPanel";
 import SelectReviewerModal from "../../component/scope/SelectReviewerModal/SelectReviewerModal";
+import PdfViewerDrawer from "../../component/pdfViewerDrawer";
 
 type RightPanelView = "comments" | "chat" | null;
 
@@ -127,6 +128,7 @@ const MOCK_DATA: FileData[] = [
 
 const ScopeDetails = () => {
   const [isReviewerModalOpen, setIsReviewerModalOpen] = useState(false);
+  const [isPdfViewerOpened, setIsPdfViewerOpened] = useState(false);
 
   const handleOpenReviewerModal = useCallback(() => {
     setIsReviewerModalOpen(true);
@@ -217,10 +219,10 @@ const ScopeDetails = () => {
 
   const handleRowSelectionChange = useCallback(
     (selectedRowKeys: React.Key[], selectedRows: FileData[]) => {
-      selectedRowKeys
-      selectedRows
+      selectedRowKeys;
+      selectedRows;
     },
-    []
+    [],
   );
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -238,7 +240,7 @@ const ScopeDetails = () => {
         setRightPanelWidth(newWidth);
       }
     },
-    [isResizing]
+    [isResizing],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -274,7 +276,7 @@ const ScopeDetails = () => {
         key: "title",
         width: "15%",
         render: (_, record) => (
-          <div className="file-title">
+          <div className="file-title cursor-pointer" onClick={() => setIsPdfViewerOpened(true)}>
             <div className="file-icon">
               <img src={record.icon === "pdf" ? IMAGES.pdfIcon : IMAGES.xlsIcon} alt="file" />
             </div>
@@ -385,7 +387,9 @@ const ScopeDetails = () => {
                   </div>
                 </div>
               }>
-              <div className="observation-icons">
+              <div
+                className="observation-icons cursor-pointer"
+                onClick={() => setIsPdfViewerOpened(true)}>
                 <img src={IMAGES.commentPlusIcon} alt="Add Observation" />
                 {/* <img src={IMAGES.commentPlusGreenIcon} alt="Add Observation" /> */}
               </div>
@@ -457,18 +461,18 @@ const ScopeDetails = () => {
         },
       },
     ],
-    []
+    [],
   );
 
   const rowSelection = useMemo(
     () => ({
       onChange: handleRowSelectionChange,
     }),
-    [handleRowSelectionChange]
+    [handleRowSelectionChange],
   );
 
   const handleSubmitReviewer = (reviewer: any) => {
-    reviewer
+    reviewer;
     setIsReviewerModalOpen(false);
   };
 
@@ -524,10 +528,14 @@ const ScopeDetails = () => {
                       <div className="assessment-step-two">
                         <h5>Risk Assessment :</h5>
                         <div className="step-two-content">
-                          <span className={`signal-icon ${getRiskLevelColor(riskAssessment.riskLevel)}`}></span>
+                          <span
+                            className={`signal-icon ${getRiskLevelColor(riskAssessment.riskLevel)}`}></span>
                           {getRiskLevelLabel(riskAssessment.riskLevel)}
                         </div>
-                        <Button className="no-style" type="primary" onClick={handleEditRiskAssessment}>
+                        <Button
+                          className="no-style"
+                          type="primary"
+                          onClick={handleEditRiskAssessment}>
                           <i className="erm-icon edit-icon" />
                         </Button>
                       </div>
@@ -613,6 +621,11 @@ const ScopeDetails = () => {
         open={isReviewerModalOpen}
         onClose={handleCloseReviewerModal}
         handleSubmit={handleSubmitReviewer}
+      />
+      <PdfViewerDrawer
+        onClose={() => setIsPdfViewerOpened(false)}
+        open={isPdfViewerOpened}
+        pdfUrl="https://morth.nic.in/sites/default/files/dd12-13_0.pdf"
       />
     </>
   );

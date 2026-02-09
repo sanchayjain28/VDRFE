@@ -38,7 +38,7 @@
 
       .pdf-document-section {
         display: grid;
-        grid-template-rows: 50px 1fr 80px;
+        grid-template-rows: 50px 1fr;
         background: #fff;
         border-right: 1px solid #e8e8e8;
         box-shadow: 2px 0 8px 0 rgba(0, 0, 0, 0.04);
@@ -111,17 +111,20 @@
           justify-content: center;
           align-items: flex-start;
           padding: 24px 0;
+          overflow-x: hidden;
 
           .react-pdf__Document {
             display: flex;
             flex-direction: column;
             align-items: center;
+            max-width: 90%;
           }
 
           .react-pdf__Page {
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            margin-bottom: 20px;
+            margin-bottom: 0;
             background: white;
+            max-width: 100%;
 
             canvas {
               display: block;
@@ -144,16 +147,6 @@
           }
         }
 
-        .pdf-drawer-footer {
-          display: flex;
-          justify-content: flex-end;
-          gap: 12px;
-          padding: 16px 24px;
-          border-top: 1px solid #e8e8e8;
-          background: #fff;
-          min-height: 80px;
-          align-items: center;
-        }
       }
 
       .pdf-summary-section {
@@ -230,7 +223,7 @@
           flex: 1;
           overflow: auto;
           padding: 30px 25px;
-          max-height: calc(100vh - 100px);
+          max-height: calc(100vh - 350px);
 
           h3 {
             font-size: 18px;
@@ -245,6 +238,57 @@
             color: #5a7665;
             margin: 0 0 15px;
           }
+        }
+      }
+    }
+
+    .pdf-drawer-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 24px;
+      border-top: 1px solid #e8e8e8;
+      background: #fff;
+      min-height: 80px;
+      align-items: center;
+    }
+  }
+
+  .react-pdf__Page canvas,
+  .react-pdf__Page__textContent.textLayer {
+    max-width: 100%;
+  }
+
+  .observation-section {
+    padding: 25px;
+
+    h5 {
+      font-size: 16px;
+      line-height: 21px;
+      font-weight: 600;
+      margin: 0 0 5px 0;
+      color: var(--primary);
+    }
+
+    .textarea {
+      background: #F4F7F4B8;
+    }
+
+    .observation-actions {
+      text-align: right;
+      margin-top: 5px;
+
+      .ant-space {
+        gap: 20px;
+      }
+
+      .no-style {
+        color: var(--text-dark-green);
+        font-weight: 600;
+        font-size: 13px;
+
+        &:hover {
+          color: var(--secondary);
         }
       }
     }
