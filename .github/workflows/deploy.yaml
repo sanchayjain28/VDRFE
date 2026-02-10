@@ -117,7 +117,7 @@ jobs:
         run: |
           aws eks update-kubeconfig --name dev-erm-eks-manual --region us-east-1
           certArn=$(aws acm list-certificates --query "CertificateSummaryList[?DomainName=='*.ermtools.app'].CertificateArn" --output text)
-          helm upgrade --install -n ${{ inputs.environment }} --create-namespace \
+          helm upgrade --install -n vdr --create-namespace \
           --set image.repository=$ECR_REGISTRY/$ECR_REPOSITORY \
           --set image.tag=$IMAGE_TAG \
           --set environment=${{ inputs.environment }} \
