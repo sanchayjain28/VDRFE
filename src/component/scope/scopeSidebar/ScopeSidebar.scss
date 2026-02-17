@@ -97,6 +97,15 @@
 .scope-list {
     margin-top: 18px;
 
+    .no-scopes-message {
+        padding: 20px 10px;
+        text-align: center;
+        color: var(--primary);
+        opacity: 0.6;
+        font-size: 14px;
+        font-style: italic;
+    }
+
     .scope-item {
         padding: 13px 10px;
         border-radius: 5px;

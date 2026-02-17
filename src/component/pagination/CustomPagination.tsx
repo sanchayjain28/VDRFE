@@ -16,16 +16,17 @@ const CustomPagination = ({
   pageSize,
   isHidePagination = false,
 }: ICustomPagination) => {
-  const getPaginationText = (page: number, pageSize: number, total: number) => {
-    if (page === 0) page = 1;
-    if (total === 0) return "Showing 0 of 0";
-    const start = (page - 1) * pageSize + 1;
-    const end = Math.min(page * pageSize, total);
-    return `Showing ${start} to ${end} of ${total}`;
+  const getPaginationText = (page: number, pageSize: number, total: number): string => {
+    if (total === 0 || pageSize === 0) {
+      return "Showing 0 of 0";
+    }
+    const currentPage = Math.max(page, 1);
+    const totalPages = Math.ceil(total / pageSize);
+    return `Showing ${currentPage} of ${totalPages}`;
   };
 
   return (
-    <div className="pagination-section">
+    <div className="pagination-section" hidden={isHidePagination}>
       <p className="table-entries">{getPaginationText(currentPage, pageSize, total)}</p>
 
       {!isHidePagination && (
