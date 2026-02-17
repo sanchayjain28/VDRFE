@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { ToastContainer } from "react-toastify";
+import { App as AntdApp } from "antd";
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -32,7 +33,7 @@ const App = () => {
   );
 
   return (
-    <>
+    <AntdApp>
       <ToastContainer
         position={"bottom-right"}
         autoClose={3000}
@@ -50,7 +51,7 @@ const App = () => {
         fallback={<div className="d-flex d-flex-middle d-flex-center h-full">Loading...</div>}>
         <RouterProvider router={router} />
       </Suspense>
-    </>
+    </AntdApp>
   );
 };
 

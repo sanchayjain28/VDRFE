@@ -1,6 +1,8 @@
-import { Drawer, Input, Select, Button, DatePicker, Form, message } from "antd";
+import { useEffect } from "react";
+import { Drawer, Input, Select, Button, DatePicker, Form, App } from "antd";
 import type { Dayjs } from "dayjs";
-
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { addScope, setLoading, setError, clearError } from "../../../store/scope/scopeSlice";
 import "./AddScope.scss";
 
 interface AddScopeProps {
@@ -18,6 +20,9 @@ interface ScopeFormValues {
 }
 
 const AddScope = ({ open, onClose }: AddScopeProps) => {
+  const { message } = App.useApp();
+  const dispatch = useAppDispatch();
+  const { isLoading, error } = useAppSelector((state) => state.scope);
   const [form] = Form.useForm<ScopeFormValues>();
   const scopeName = Form.useWatch("scopeName", form);
 
@@ -27,20 +32,44 @@ const AddScope = ({ open, onClose }: AddScopeProps) => {
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      values
-      // TODO: Add API call to submit the form
+
+      // Clear any previous errors
+      dispatch(clearError());
+
+      // Set loading state
+      dispatch(setLoading(true));
+
+      // Add scope to Redux store
+      dispatch(addScope(values));
+
+      // Simulate API call delay (remove this in production when real API is integrated)
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       message.success("Scope added successfully!");
       form.resetFields();
+      dispatch(setLoading(false));
       onClose();
     } catch (error) {
       console.error("Validation failed:", error);
+      dispatch(setLoading(false));
+      dispatch(setError("Failed to add scope. Please try again."));
     }
   };
 
   const handleClose = () => {
     form.resetFields();
+    dispatch(clearError());
+    dispatch(setLoading(false));
     onClose();
   };
+
+  // Show error message if there's an error
+  useEffect(() => {
+    if (error) {
+      message.error(error);
+      dispatch(clearError());
+    }
+  }, [error, dispatch]);
 
   return (
     <Drawer
@@ -68,7 +97,8 @@ const AddScope = ({ open, onClose }: AddScopeProps) => {
             className="primary-btn"
             shape="round"
             onClick={handleSubmit}
-            disabled={!isFormValid}>
+            disabled={!isFormValid || isLoading}
+            loading={isLoading}>
             ADD SCOPE
           </Button>
         </div>
@@ -122,6 +152,10 @@ const AddScope = ({ open, onClose }: AddScopeProps) => {
               </>
             }>
             <Select.Option value="environmental">Environmental</Select.Option>
+            <Select.Option value="social">Social</Select.Option>
+            <Select.Option value="economic">Economic</Select.Option>
+            <Select.Option value="regulatory">Regulatory</Select.Option>
+            <Select.Option value="other">Other</Select.Option>
           </Select>
         </Form.Item>
 
@@ -129,13 +163,18 @@ const AddScope = ({ open, onClose }: AddScopeProps) => {
           <Form.Item name="scopeOwner" label="Scope Owner" style={{ marginBottom: 0 }}>
             <Select
               className="dropdown-ui"
+              placeholder="Select owner"
               suffixIcon={
                 <>
                   <i className="erm-icon dropdown-arrow-icon" />
                   <i className="erm-icon dropdown-top-arrow-icon" />
                 </>
               }
-              placeholder="Select owner"
+              options={[
+                { label: "John Doe", value: "john-doe" },
+                { label: "Jane Smith", value: "jane-smith" },
+                { label: "Michael Brown", value: "michael-brown" },
+              ]}
             />
           </Form.Item>
           <span className="info-text">
