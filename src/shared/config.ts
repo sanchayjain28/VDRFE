@@ -10,7 +10,7 @@ interface IConfig {
 const LOCALHOST_CONFIG: IConfig = {
   BASE_URL: "https://dev.test.com/",
   USER_BASE_URL: "https://dev.test.com/",
-  INGESTION_BASE_URL: "http://localhost:8000/ingestion/",
+  INGESTION_BASE_URL: "http://localhost:8001/ingestion/",
   HOST: hostname,
 };
 
