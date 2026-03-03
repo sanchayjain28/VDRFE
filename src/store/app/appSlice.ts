@@ -5,6 +5,7 @@ import type { IAppSlice } from "./appInterface";
 
 const initialState: IAppSlice = {
   isProjectLoading: false,
+  selectedProjectId: null,
 };
 
 export const appSlice = createSlice({
@@ -19,9 +20,12 @@ export const appSlice = createSlice({
     setIProjectLoading: (state, action: PayloadAction<boolean>) => {
       state.isProjectLoading = action.payload;
     },
+    setSelectedProjectId: (state, action: PayloadAction<string | null>) => {
+      state.selectedProjectId = action.payload;
+    },
   },
 });
 
-export const { setIProjectLoading } = appSlice.actions;
+export const { setIProjectLoading, setSelectedProjectId } = appSlice.actions;
 
 export default appSlice.reducer;

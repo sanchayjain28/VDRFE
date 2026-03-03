@@ -2,6 +2,8 @@ import { Card, Progress, Row, Col, Space, Typography, Divider, Flex, Tooltip } f
 import { useNavigate } from "react-router-dom";
 import { Collaborators } from "../../";
 import { PATHS } from "../../../shared";
+import { setSelectedProjectId } from "../../../store/app/appSlice";
+import { store } from "../../../store/store";
 import "./ProjectCard.scss";
 
 const { Title, Text } = Typography;
@@ -45,6 +47,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
   const docsTotalPercent = docsCompletedPercent + docsInProgressPercent;
 
   const handleCardClick = () => {
+    store.dispatch(setSelectedProjectId(project.id));
     navigate(PATHS.projectDetails, { state: { projectId: project.id } });
   };
 

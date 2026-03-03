@@ -14,12 +14,13 @@ import storage from "redux-persist/lib/storage"; // localStorage
 import appSlice from "./app/appSlice";
 import knowledgeAIChatSlice from "./knowledgeAIChat/knowledgeAIChatSlice";
 import scopeSlice from "./scope/scopeSlice";
+import sharepointSlice from "./sharepoint/sharepointSlice";
 
 //  Persist config
 const persistConfig = {
   key: "erm-frontend",
   storage, // localStorage
-  whitelist: ["app", "knowledgeAIChat", "scope"],
+  whitelist: ["app", "knowledgeAIChat", "scope", "sharepoint"],
 };
 
 //  Combine reducers
@@ -27,6 +28,7 @@ const appReducer = combineReducers({
   app: appSlice,
   knowledgeAIChat: knowledgeAIChatSlice,
   scope: scopeSlice,
+  sharepoint: sharepointSlice,
 });
 
 //  Types

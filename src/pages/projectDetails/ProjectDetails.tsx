@@ -1,11 +1,13 @@
-import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useMemo, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Breadcrumb, Table, Avatar, Button, Tooltip } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { IMAGES, PATHS } from "../../shared";
 import { RecentActivity, ScopeFilterBar } from "../../component";
 import { Activity } from "../../component/dashboard/recentActivity/RecentActivity";
 import CustomPagination from "../../component/pagination/CustomPagination";
+import { setSelectedProjectId } from "../../store/app/appSlice";
+import { store } from "../../store/store";
 import "./ProjectDetails.scss";
 
 interface ScopeData {
@@ -31,7 +33,16 @@ const PAGE_SIZE = 10;
 
 const ProjectDetails = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Sync projectId from navigation state into Redux store
+  useEffect(() => {
+    const projectId = (location.state as { projectId?: string })?.projectId;
+    if (projectId) {
+      store.dispatch(setSelectedProjectId(projectId));
+    }
+  }, [location.state]);
 
   const [scopeData] = useState<ScopeData[]>([
     { key: "1", scope: "1. ESG Strategy", dueDate: "23/1/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "Moderate", color: "yellow" }, redFlag: 3, openComments: 5, hasViewDetails: true },

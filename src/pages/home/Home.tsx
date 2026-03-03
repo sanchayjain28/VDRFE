@@ -1,13 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Row, Col, Statistic, Space, Typography } from "antd";
+import { Button, Row, Col, Statistic, Space, Typography, Spin } from "antd";
 import { RecentActivity, ProjectCard, type Activity, type ProjectCardData } from "../../component/dashboard";
 import { PATHS } from "../../shared/constants";
-import { IMAGES } from "../../shared";
+import { getProjects, type IProject } from "../../services/projects";
 import "./Home.scss";
 
 const { Title, Text } = Typography;
 
+const mapProjectToCardData = (project: IProject): ProjectCardData => ({
+  id: project.id,
+  name: project.name,
+  status: project.status === "inactive" ? "Inactive" : "Active",
+  date: project.created_at
+    ? new Date(project.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    : "-",
+  risk: project.risk_level === "high" ? "High Risk" : project.risk_level === "low" ? "Low Risk" : "Medium Risk",
+  scope: {
+    flagged: project.scope_flagged ?? 0,
+    completed: project.scope_completed ?? 0,
+    total: project.scope_total ?? 1,
+  },
+  documents: {
+    completed: project.documents_completed ?? 0,
+    inProgress: project.documents_in_progress ?? 0,
+    total: project.documents_total ?? 1,
+  },
+  collaborators: (project.collaborators ?? []).map((c) => ({
+    id: c.id,
+    name: c.name,
+    avatar: c.avatar,
+    role: c.role,
+  })),
+});
 
 const Home = () => {
   const navigate = useNavigate();
@@ -17,125 +42,20 @@ const Home = () => {
     reviewedDocuments: { current: 3, total: 100 },
   });
 
-  const [projects] = useState<ProjectCardData[]>([
-    {
-      id: "1",
-      name: "Shell",
-      status: "Active",
-      date: "Mar 15, 2024",
-      risk: "Medium Risk",
-      scope: { flagged: 13, completed: 5, total: 22 },
-      documents: { completed: 981, inProgress: 200, total: 1556 },
-      collaborators: [
-        {
-          id: "1",
-          name: "Sarah Chen",
-          avatar: IMAGES.avatarImage,
-          role: "Project Manager",
-        },
-        {
-          id: "2",
-          name: "James Whitmore",
-          avatar: "https://i.pravatar.cc/150?img=3",
-          role: "Technical Lead",
-        },
-        {
-          id: "3",
-          name: "Michael Anderson",
-          avatar: "https://i.pravatar.cc/150?img=12",
-          role: "Analyst",
-        },
-      ],
-    },
-    {
-      id: "2",
-      name: "ExxonMobil",
-      status: "Active",
-      date: "Mar 15, 2024",
-      risk: "High Risk",
-      scope: { flagged: 3, completed: 5, total: 22 },
-      documents: { completed: 981, inProgress: 200, total: 1556 },
-      collaborators: [
-        {
-          id: "1",
-          name: "Sarah Chen",
-          avatar: IMAGES.avatarImage,
-          role: "Project Manager",
-        },
-        {
-          id: "2",
-          name: "James Whitmore",
-          avatar: "https://i.pravatar.cc/150?img=3",
-          role: "Technical Lead",
-        },
-        {
-          id: "3",
-          name: "Michael Anderson",
-          avatar: "https://i.pravatar.cc/150?img=12",
-          role: "Analyst",
-        },
-      ],
-    },
-    {
-      id: "3",
-      name: "Ford",
-      status: "Active",
-      date: "Mar 15, 2024",
-      risk: "Low Risk",
-      scope: { flagged: 3, completed: 5, total: 22 },
-      documents: { completed: 981, inProgress: 200, total: 1556 },
-      collaborators: [
-        {
-          id: "1",
-          name: "Sarah Chen",
-          avatar: IMAGES.avatarImage,
-          role: "Project Manager",
-        },
-        {
-          id: "2",
-          name: "James Whitmore",
-          avatar: "https://i.pravatar.cc/150?img=3",
-          role: "Technical Lead",
-        },
-        {
-          id: "3",
-          name: "Michael Anderson",
-          avatar: "https://i.pravatar.cc/150?img=12",
-          role: "Analyst",
-        },
-        {
-          id: "4",
-          name: "Emily Rodriguez",
-          avatar: "https://i.pravatar.cc/150?img=47",
-          role: "Designer",
-        },
-        {
-          id: "5",
-          name: "David Kim",
-          avatar: "https://i.pravatar.cc/150?img=33",
-          role: "Developer",
-        },
-        {
-          id: "6",
-          name: "Lisa Thompson",
-          avatar: "https://i.pravatar.cc/150?img=45",
-          role: "QA Engineer",
-        },
-        {
-          id: "7",
-          name: "Robert Martinez",
-          avatar: "https://i.pravatar.cc/150?img=15",
-          role: "Business Analyst",
-        },
-        {
-          id: "8",
-          name: "Jennifer Lee",
-          avatar: "https://i.pravatar.cc/150?img=20",
-          role: "Product Owner",
-        },
-      ],
-    },
-  ]);
+  const [projects, setProjects] = useState<ProjectCardData[]>([]);
+  const [isProjectsLoading, setIsProjectsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      setIsProjectsLoading(true);
+      const res = await getProjects({ limit: 12, page: 1, q: "" });
+      if (res?.projects) {
+        setProjects(res.projects.map(mapProjectToCardData));
+      }
+      setIsProjectsLoading(false);
+    };
+    fetchProjects();
+  }, []);
 
   const [activities] = useState<Activity[]>([
     {
@@ -253,13 +173,15 @@ const Home = () => {
                 <Title level={4} className="section-title">
                   Projects ({projects.length})
                 </Title>
-                <Row gutter={[20, 20]}>
-                  {projects.map((project) => (
-                    <Col xs={24} sm={12} lg={8} key={project.id}>
-                      <ProjectCard project={project} />
-                    </Col>
-                  ))}
-                </Row>
+                <Spin spinning={isProjectsLoading}>
+                  <Row gutter={[20, 20]}>
+                    {projects.map((project) => (
+                      <Col xs={24} sm={12} lg={8} key={project.id}>
+                        <ProjectCard project={project} />
+                      </Col>
+                    ))}
+                  </Row>
+                </Spin>
               </div>
             </Col>
 

@@ -12,10 +12,11 @@ interface IScopeHeader {
   onCommentsToggle?: () => void;
   onChatToggle?: () => void;
   onOpenReviewerModal?: () => void;
+  onIngestToggle?: () => void;
 }
 
 const ScopeHeader = (props: IScopeHeader) => {
-  const { isCommentsOpen, isChatOpen, onCommentsToggle, onChatToggle, onOpenReviewerModal } = props;
+  const { isCommentsOpen, isChatOpen, onCommentsToggle, onChatToggle, onOpenReviewerModal, onIngestToggle } = props;
   const navigate = useNavigate();
   const [isAddFlagDrawerOpen, setIsAddFlagDrawerOpen] = useState(false);
 
@@ -31,11 +32,15 @@ const ScopeHeader = (props: IScopeHeader) => {
     description
   };
 
+  const handleIngest = () => {
+    if (onIngestToggle) onIngestToggle();
+  };
+
   return (
     <div className="scope-header-wrapper">
       <div className="scope-header">
         <div className="breadcrumb-wrapper">
-          <Breadcrumb 
+          <Breadcrumb
             className="page-breadcrumb"
             items={[
               {
@@ -49,38 +54,44 @@ const ScopeHeader = (props: IScopeHeader) => {
         </div>
 
         <div className="scope-actions">
+          <Button className="primary-btn" type="primary" shape="round">
+            <i className="erm-icon setting" /> SET INSTRUCTION
+          </Button>
+
+          <Button className="primary-btn" type="primary" shape="round" onClick={handleIngest}>
+            <i className="erm-icon refresh-icon" /> INGEST
+          </Button>
+
           <Button
             className={`primary-btn ${isChatOpen ? "active" : ""}`}
             type="primary"
             shape="round"
-            onClick={onChatToggle}>
+            disabled>
             <i className="erm-icon ai-icon" /> CHAT
           </Button>
 
           <Button
             type="text"
             aria-label="flagIcon"
-            className={isCommentsOpen ? "active" : ""}
-            onClick={handleOpenAddFlagDrawer}>
+            disabled>
             <img src={IMAGES.flagIcon} alt="flagIcon" />
           </Button>
 
           <Button
             type="text"
             aria-label="checkPrimaryIcon"
-            className={isCommentsOpen ? "active" : ""}>
+            disabled>
             <img src={IMAGES.checkPrimaryIcon} alt="checkPrimaryIcon" />
           </Button>
 
           <Button
             type="text"
             aria-label="Comments"
-            onClick={onCommentsToggle}
-            className={isCommentsOpen ? "active" : ""}>
+            disabled>
             <img src={IMAGES.commentIcon} alt="Comments" />
           </Button>
 
-          <Button type="text" aria-label="Export">
+          <Button type="text" aria-label="Export" disabled>
             <img src={IMAGES.exportIcon} alt="Export" />
           </Button>
         </div>

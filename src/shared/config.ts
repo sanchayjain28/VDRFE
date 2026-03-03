@@ -3,24 +3,28 @@ const hostname = window?.location?.hostname;
 interface IConfig {
   BASE_URL: string;
   USER_BASE_URL: string;
+  INGESTION_BASE_URL: string;
   HOST: string;
 }
 // For Localhost
 const LOCALHOST_CONFIG: IConfig = {
   BASE_URL: "https://dev.test.com/",
   USER_BASE_URL: "https://dev.test.com/",
+  INGESTION_BASE_URL: "http://localhost:8000/ingestion/",
   HOST: hostname,
 };
 
 const DEV_CONFIG: IConfig = {
   BASE_URL: "https://dev.test.com/",
   USER_BASE_URL: "https://dev.test.com/",
+  INGESTION_BASE_URL: "https://dev-ingestion.ermtools.app/ingestion/",
   HOST: hostname,
 };
 
 const PRE_PROD_CONFIG: IConfig = {
   BASE_URL: "https://prod.test.com/",
   USER_BASE_URL: "https://prod.test.com/",
+  INGESTION_BASE_URL: "https://prod-ingestion.ermtools.app/ingestion/",
   HOST: hostname,
 };
 
