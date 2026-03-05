@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
-import { Button, Table } from "antd";
+import { Button, Table, Tag } from "antd";
 import { IMAGES } from "../../shared";
 import type { Comment } from "../../component/scope/comments/Comments";
 import {
@@ -16,11 +16,12 @@ import SelectedSourcesDrawer from "../../component/selectedSourcesDrawer/Selecte
 import { useAppSelector } from "../../store/hooks";
 import { getProjectDocuments } from "../../services/sharepoint";
 import { getProjectDetails } from "../../services/projects";
-import { IProjectDocument } from "../../store/sharepoint/sharepoint.interface";
+import { IProjectDocument, ISharepointList } from "../../store/sharepoint/sharepoint.interface";
+import { IDocumentListItem, getVdrDocuments } from "../../services/vdrAgent";
 
 type RightPanelView = "comments" | "chat" | null;
 
-
+const POLL_INTERVAL_MS = 12000;
 
 const ScopeDetails = () => {
   const projectId = useAppSelector((state) => state.app.selectedProjectId);
@@ -55,11 +56,31 @@ const ScopeDetails = () => {
 
   const { projectDocuments, isProjectDocumentsLoading } = useAppSelector((state) => state.sharepoint);
 
+  // VDR agent document data for status and fitment columns
+  const [vdrDocuments, setVdrDocuments] = useState<IDocumentListItem[]>([]);
+
   useEffect(() => {
     if (projectId) {
       getProjectDetails(projectId);
       getProjectDocuments(projectId);
     }
+  }, [projectId]);
+
+  // Polling useEffect — fetches vdr-agent document data every 12 seconds
+  useEffect(() => {
+    if (!projectId) return;
+
+    const fetchVdrData = () => {
+      getVdrDocuments(projectId).then((data) => {
+        if (data !== undefined) setVdrDocuments(data);
+      });
+    };
+
+    fetchVdrData(); // immediate fetch on mount / projectId change
+
+    const intervalId = setInterval(fetchVdrData, POLL_INTERVAL_MS);
+
+    return () => clearInterval(intervalId); // cleanup prevents memory leak
   }, [projectId]);
 
   const handleFileClick = (item: IProjectDocument) => {
@@ -78,7 +99,7 @@ const ScopeDetails = () => {
     setIsManageSyncOpen(false);
   };
 
-  const handleSelectSources = (selectedItems: any[]) => {
+  const handleSelectSources = (_selectedItems: ISharepointList[]) => {
     if (projectId) {
       getProjectDetails(projectId);
       getProjectDocuments(projectId);
@@ -109,14 +130,9 @@ const ScopeDetails = () => {
     setRightPanelView(null);
   };
 
-
-
-
-
   const handleRowSelectionChange = useCallback(
-    (selectedRowKeys: React.Key[], selectedRows: IProjectDocument[]) => {
-      selectedRowKeys;
-      selectedRows;
+    (_selectedRowKeys: React.Key[], _selectedRows: IProjectDocument[]) => {
+      // selection handler — extend in future plans
     },
     [],
   );
@@ -164,8 +180,6 @@ const ScopeDetails = () => {
     };
   }, [isResizing, handleMouseMove, handleMouseUp]);
 
-
-
   const rowSelection = useMemo(
     () => ({
       onChange: handleRowSelectionChange,
@@ -173,8 +187,8 @@ const ScopeDetails = () => {
     [handleRowSelectionChange],
   );
 
-  const handleSubmitReviewer = (reviewer: any) => {
-    reviewer;
+  const handleSubmitReviewer = (reviewer: unknown) => {
+    void reviewer;
     setIsReviewerModalOpen(false);
   };
 
@@ -206,6 +220,7 @@ const ScopeDetails = () => {
                 <Table<IProjectDocument>
                   loading={isProjectDocumentsLoading}
                   className="files-table"
+                  rowSelection={rowSelection}
                   columns={[
                     {
                       title: "Document",
@@ -229,7 +244,17 @@ const ScopeDetails = () => {
                       key: "status",
                       width: 160,
                       className: "text-align-right",
-                      render: (_, record) => record.status || "-",
+                      render: (_, record) => {
+                        const vdrDoc = vdrDocuments.find((d) => d.id === record.id);
+                        const status = vdrDoc?.summary_status ?? "pending";
+                        const colorMap: Record<string, string> = {
+                          pending: "default",
+                          processing: "processing",
+                          done: "success",
+                          failed: "error",
+                        };
+                        return <Tag color={colorMap[status] ?? "default"}>{status}</Tag>;
+                      },
                     },
                     {
                       title: "File Summary",
@@ -243,8 +268,16 @@ const ScopeDetails = () => {
                       dataIndex: "scopeFitting",
                       key: "scopeFitting",
                       width: "20%",
-                      render: () => <div className="table-two-line">-</div>,
-                    }
+                      render: (_, record) => {
+                        const vdrDoc = vdrDocuments.find((d) => d.id === record.id);
+                        if (!vdrDoc) return <div className="table-two-line">-</div>;
+                        return (
+                          <div className="table-two-line">
+                            {vdrDoc.fitment_done_count} / {vdrDoc.fitment_total_count}
+                          </div>
+                        );
+                      },
+                    },
                   ]}
                   dataSource={projectDocuments}
                   rowKey="id"
