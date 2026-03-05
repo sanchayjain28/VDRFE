@@ -16,7 +16,7 @@ interface IScopeHeader {
 }
 
 const ScopeHeader = (props: IScopeHeader) => {
-  const { isCommentsOpen, isChatOpen, onCommentsToggle, onChatToggle, onOpenReviewerModal, onIngestToggle } = props;
+  const { isChatOpen, onOpenReviewerModal, onIngestToggle } = props;
   const navigate = useNavigate();
   const [isAddFlagDrawerOpen, setIsAddFlagDrawerOpen] = useState(false);
 
@@ -73,6 +73,7 @@ const ScopeHeader = (props: IScopeHeader) => {
           <Button
             type="text"
             aria-label="flagIcon"
+            onClick={handleOpenAddFlagDrawer}
             disabled>
             <img src={IMAGES.flagIcon} alt="flagIcon" />
           </Button>
