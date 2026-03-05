@@ -36,13 +36,14 @@ const ProjectDetails = () => {
   const location = useLocation();
   const [currentPage, setCurrentPage] = useState(1);
 
+  const projectId = (location.state as { projectId?: string })?.projectId ?? null;
+
   // Sync projectId from navigation state into Redux store
   useEffect(() => {
-    const projectId = (location.state as { projectId?: string })?.projectId;
     if (projectId) {
       store.dispatch(setSelectedProjectId(projectId));
     }
-  }, [location.state]);
+  }, [projectId]);
 
   const [scopeData] = useState<ScopeData[]>([
     { key: "1", scope: "1. ESG Strategy", dueDate: "23/1/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "Moderate", color: "yellow" }, redFlag: 3, openComments: 5, hasViewDetails: true },
@@ -117,7 +118,7 @@ const ProjectDetails = () => {
 
 
   const handleViewDetails = () => {
-    navigate(PATHS.scopeDetails);
+    navigate(PATHS.scopeDetails, { state: { projectId } });
   };
 
   const columns: ColumnsType<ScopeData> = useMemo(

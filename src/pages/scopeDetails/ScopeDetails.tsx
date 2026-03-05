@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { Button, Table, Tag } from "antd";
+import { useLocation } from "react-router-dom";
 import { IMAGES } from "../../shared";
 import type { Comment } from "../../component/scope/comments/Comments";
 import {
@@ -14,20 +15,33 @@ import SelectReviewerModal from "../../component/scope/SelectReviewerModal/Selec
 import PdfViewerDrawer from "../../component/pdfViewerDrawer";
 import SelectedSourcesDrawer from "../../component/selectedSourcesDrawer/SelectedSourcesDrawer";
 import { useAppSelector } from "../../store/hooks";
+import { setSelectedProjectId } from "../../store/app/appSlice";
+import { store } from "../../store/store";
 import { getProjectDocuments } from "../../services/sharepoint";
 import { getProjectDetails } from "../../services/projects";
 import { IProjectDocument, ISharepointList } from "../../store/sharepoint/sharepoint.interface";
-import { IDocumentListItem, getVdrDocuments } from "../../services/vdrAgent";
+import { IDocumentListItem, ITopic, getVdrDocuments } from "../../services/vdrAgent";
 
 type RightPanelView = "comments" | "chat" | null;
 
 const POLL_INTERVAL_MS = 12000;
 
 const ScopeDetails = () => {
+  const location = useLocation();
+
+  // Sync projectId from navigation state into Redux (ensures correct project even after refresh path)
+  useEffect(() => {
+    const navProjectId = (location.state as { projectId?: string })?.projectId;
+    if (navProjectId) {
+      store.dispatch(setSelectedProjectId(navProjectId));
+    }
+  }, [location.state]);
+
   const projectId = useAppSelector((state) => state.app.selectedProjectId);
 
   const [isReviewerModalOpen, setIsReviewerModalOpen] = useState(false);
   const [isPdfViewerOpened, setIsPdfViewerOpened] = useState(false);
+  const [selectedTopic, setSelectedTopic] = useState<ITopic | null>(null);
 
   const handleOpenReviewerModal = useCallback(() => {
     setIsReviewerModalOpen(true);
@@ -199,7 +213,7 @@ const ScopeDetails = () => {
           <div className="inner-app-row">
             {/* LEFT SIDEBAR */}
             <div className="scope-sidebar">
-              <ScopeSidebar />
+              <ScopeSidebar onTopicSelect={setSelectedTopic} />
             </div>
 
             {/* MAIN CONTENT */}
@@ -212,6 +226,8 @@ const ScopeDetails = () => {
                 onChatToggle={handleChatToggle}
                 onOpenReviewerModal={handleOpenReviewerModal}
                 onIngestToggle={handleIngestToggle}
+                selectedTopic={selectedTopic}
+                onTopicUpdate={setSelectedTopic}
               />
 
               <div className="scope-details-content">
@@ -258,10 +274,19 @@ const ScopeDetails = () => {
                     },
                     {
                       title: "File Summary",
-                      dataIndex: "fileSummary",
                       key: "fileSummary",
                       width: "20%",
-                      render: () => <div className="table-two-line">-</div>,
+                      render: (_, record) => {
+                        const vdrDoc = vdrDocuments.find((d) => d.id === record.id);
+                        const text = vdrDoc?.summary_text;
+                        if (!text) return <div className="table-two-line">-</div>;
+                        const truncated = text.length > 120 ? text.slice(0, 120) + "…" : text;
+                        return (
+                          <div className="table-two-line" title={text}>
+                            {truncated}
+                          </div>
+                        );
+                      },
                     },
                     {
                       title: "Scope Fitting",

@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Avatar, Breadcrumb, Button, Progress } from "antd";
+import { Avatar, Breadcrumb, Button, Form, Input, Modal, Progress, App } from "antd";
 import { IMAGES, PATHS } from "../../../shared";
 import AddFlagDrawer from "../addFlagDrawer/AddFlagDrawer";
+import { ITopic, updateTopicInstruction } from "../../../services/vdrAgent";
 import "./ScopeHeader.scss";
 
 interface IScopeHeader {
@@ -13,12 +14,18 @@ interface IScopeHeader {
   onChatToggle?: () => void;
   onOpenReviewerModal?: () => void;
   onIngestToggle?: () => void;
+  selectedTopic?: ITopic | null;
+  onTopicUpdate?: (topic: ITopic) => void;
 }
 
 const ScopeHeader = (props: IScopeHeader) => {
-  const { isChatOpen, onOpenReviewerModal, onIngestToggle } = props;
+  const { isChatOpen, onOpenReviewerModal, onIngestToggle, selectedTopic, onTopicUpdate } = props;
+  const { message } = App.useApp();
   const navigate = useNavigate();
   const [isAddFlagDrawerOpen, setIsAddFlagDrawerOpen] = useState(false);
+  const [isInstructionModalOpen, setIsInstructionModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [instructionForm] = Form.useForm<{ instruction: string }>();
 
   const handleOpenAddFlagDrawer = () => {
     setIsAddFlagDrawerOpen(true);
@@ -34,6 +41,35 @@ const ScopeHeader = (props: IScopeHeader) => {
 
   const handleIngest = () => {
     if (onIngestToggle) onIngestToggle();
+  };
+
+  const handleOpenInstructionModal = () => {
+    if (!selectedTopic) {
+      message.warning("Please select a scope from the sidebar first.");
+      return;
+    }
+    instructionForm.setFieldsValue({ instruction: selectedTopic.instruction ?? "" });
+    setIsInstructionModalOpen(true);
+  };
+
+  const handleSubmitInstruction = async () => {
+    if (!selectedTopic) return;
+    try {
+      const { instruction } = await instructionForm.validateFields();
+      setIsSubmitting(true);
+      const updated = await updateTopicInstruction(selectedTopic.id, instruction);
+      if (updated) {
+        onTopicUpdate?.(updated);
+        message.success("Instruction updated successfully!");
+      } else {
+        message.error("Failed to update instruction. Please try again.");
+      }
+      setIsInstructionModalOpen(false);
+    } catch {
+      // validation error — do nothing
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -54,7 +90,11 @@ const ScopeHeader = (props: IScopeHeader) => {
         </div>
 
         <div className="scope-actions">
-          <Button className="primary-btn" type="primary" shape="round">
+          <Button
+            className="primary-btn"
+            type="primary"
+            shape="round"
+            onClick={handleOpenInstructionModal}>
             <i className="erm-icon setting" /> SET INSTRUCTION
           </Button>
 
@@ -147,6 +187,24 @@ const ScopeHeader = (props: IScopeHeader) => {
         onClose={handleCloseAddFlagDrawer}
         onAdd={handleAddFlag}
       />
+
+      <Modal
+        title={`Set Instruction — ${selectedTopic?.name ?? ""}`}
+        open={isInstructionModalOpen}
+        onCancel={() => setIsInstructionModalOpen(false)}
+        onOk={handleSubmitInstruction}
+        okText="Save"
+        confirmLoading={isSubmitting}
+        destroyOnClose>
+        <Form form={instructionForm} layout="vertical">
+          <Form.Item
+            name="instruction"
+            label="Instruction"
+            rules={[{ max: 1000, message: "Instruction must not exceed 1000 characters" }]}>
+            <Input.TextArea rows={5} maxLength={1000} placeholder="Enter instruction for this scope." />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

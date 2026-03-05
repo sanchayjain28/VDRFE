@@ -1,28 +1,26 @@
 import { useEffect } from "react";
-import { Drawer, Input, Select, Button, DatePicker, Form, App } from "antd";
-import type { Dayjs } from "dayjs";
+import { Drawer, Input, Button, Form, App } from "antd";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { addScope, setLoading, setError, clearError } from "../../../store/scope/scopeSlice";
+import { setLoading, setError, clearError } from "../../../store/scope/scopeSlice";
+import { createTopic, ITopic } from "../../../services/vdrAgent";
 import "./AddScope.scss";
 
 interface AddScopeProps {
   open: boolean;
   onClose: () => void;
+  onSuccess?: (topic: ITopic) => void;
 }
 
 interface ScopeFormValues {
   scopeName: string;
-  description?: string;
-  category: string;
-  riskLevel: string;
-  scopeOwner?: string;
-  defaultDueDate?: Dayjs;
+  instruction?: string;
 }
 
-const AddScope = ({ open, onClose }: AddScopeProps) => {
+const AddScope = ({ open, onClose, onSuccess }: AddScopeProps) => {
   const { message } = App.useApp();
   const dispatch = useAppDispatch();
   const { isLoading, error } = useAppSelector((state) => state.scope);
+  const projectId = useAppSelector((state) => state.app.selectedProjectId);
   const [form] = Form.useForm<ScopeFormValues>();
   const scopeName = Form.useWatch("scopeName", form);
 
@@ -33,21 +31,27 @@ const AddScope = ({ open, onClose }: AddScopeProps) => {
     try {
       const values = await form.validateFields();
 
-      // Clear any previous errors
       dispatch(clearError());
-
-      // Set loading state
       dispatch(setLoading(true));
 
-      // Add scope to Redux store
-      dispatch(addScope(values));
+      if (!projectId) {
+        dispatch(setError("No project selected."));
+        dispatch(setLoading(false));
+        return;
+      }
 
-      // Simulate API call delay (remove this in production when real API is integrated)
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const topic = await createTopic(projectId, values.scopeName, values.instruction);
+
+      if (!topic) {
+        dispatch(setError("Failed to add scope. Please try again."));
+        dispatch(setLoading(false));
+        return;
+      }
 
       message.success("Scope added successfully!");
       form.resetFields();
       dispatch(setLoading(false));
+      onSuccess?.(topic);
       onClose();
     } catch (error) {
       console.error("Validation failed:", error);
@@ -106,10 +110,6 @@ const AddScope = ({ open, onClose }: AddScopeProps) => {
       <Form
         form={form}
         layout="vertical"
-        initialValues={{
-          category: "environmental",
-          riskLevel: "medium",
-        }}
         className="add-scope-form">
         <Form.Item
           name="scopeName"
@@ -131,59 +131,20 @@ const AddScope = ({ open, onClose }: AddScopeProps) => {
         </Form.Item>
 
         <Form.Item
-          name="description"
-          label="Description"
-          rules={[{ max: 500, message: "Description must not exceed 500 characters" }]}>
+          name="instruction"
+          label={
+            <span>
+              Instruction <span className="required">*</span>
+            </span>
+          }
+          required={false}
+          rules={[{ max: 500, message: "Instruction must not exceed 500 characters" }]}>
           <Input.TextArea
             className="textarea"
             rows={3}
             maxLength={500}
-            placeholder="Briefly describe what this scope covers for compliance and reporting."
+            placeholder="Provide instructions for this scope."
           />
-        </Form.Item>
-
-        <Form.Item name="category" label="Category">
-          <Select
-            className="dropdown-ui"
-            suffixIcon={
-              <>
-                <i className="erm-icon dropdown-arrow-icon" />
-                <i className="erm-icon dropdown-top-arrow-icon" />
-              </>
-            }>
-            <Select.Option value="environmental">Environmental</Select.Option>
-            <Select.Option value="social">Social</Select.Option>
-            <Select.Option value="economic">Economic</Select.Option>
-            <Select.Option value="regulatory">Regulatory</Select.Option>
-            <Select.Option value="other">Other</Select.Option>
-          </Select>
-        </Form.Item>
-
-        <div className="form-group">
-          <Form.Item name="scopeOwner" label="Scope Owner" style={{ marginBottom: 0 }}>
-            <Select
-              className="dropdown-ui"
-              placeholder="Select owner"
-              suffixIcon={
-                <>
-                  <i className="erm-icon dropdown-arrow-icon" />
-                  <i className="erm-icon dropdown-top-arrow-icon" />
-                </>
-              }
-              options={[
-                { label: "John Doe", value: "john-doe" },
-                { label: "Jane Smith", value: "jane-smith" },
-                { label: "Michael Brown", value: "michael-brown" },
-              ]}
-            />
-          </Form.Item>
-          <span className="info-text">
-            Owner will be responsible for managing requests under this scope.
-          </span>
-        </div>
-
-        <Form.Item name="defaultDueDate" label="Default Due Date">
-          <DatePicker className="input-field date-picker" />
         </Form.Item>
       </Form>
     </Drawer>

@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import { get, vdrAgentApi } from "./apiClients";
+import { get, patch, post, vdrAgentApi } from "./apiClients";
 
 export interface ITopic {
   id: string;
@@ -18,6 +18,7 @@ export interface IDocumentListItem {
   file_type: string;
   page_count: number | null;
   summary_status: "pending" | "processing" | "done" | "failed";
+  summary_text: string | null;
   fitment_done_count: number;
   fitment_total_count: number;
 }
@@ -28,6 +29,20 @@ export interface IFitmentItem {
   status: "pending" | "done" | "failed";
   reasoning: string | null;
 }
+
+export const createTopic = async (
+  projectId: string,
+  name: string,
+  instruction?: string,
+): Promise<ITopic | undefined> => {
+  try {
+    const res = await post(vdrAgentApi, "topics", { project_id: projectId, name, instruction: instruction ?? "" });
+    return res.data as ITopic;
+  } catch (error) {
+    console.error("createTopic error:", error);
+    return undefined;
+  }
+};
 
 export const getTopics = async (projectId: string): Promise<ITopic[] | undefined> => {
   try {
@@ -56,6 +71,19 @@ export const getDocumentFitment = async (documentId: string): Promise<IFitmentIt
     return await get(vdrAgentApi, `documents/${documentId}/fitment`);
   } catch (error) {
     console.error("getDocumentFitment error:", error);
+    return undefined;
+  }
+};
+
+export const updateTopicInstruction = async (
+  topicId: string,
+  instruction: string,
+): Promise<ITopic | undefined> => {
+  try {
+    const res = await patch(vdrAgentApi, `topics/${topicId}`, { instruction });
+    return res.data as ITopic;
+  } catch (error) {
+    console.error("updateTopicInstruction error:", error);
     return undefined;
   }
 };

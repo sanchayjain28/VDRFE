@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import { get, patch, ingestionApi } from "./apiClients";
+import { get, post, patch, ingestionApi } from "./apiClients";
 import { store } from "../store/store";
 import { setSyncedFiles } from "../store/sharepoint/sharepointSlice";
 import type { ISource, IProjectDetails } from "../store/sharepoint/sharepoint.interface";
@@ -73,6 +73,35 @@ export const updateProjectSources = async (
     } catch (error: any) {
         console.error("updateProjectSources error", error);
         toast.error("Failed to save sources.");
+        return undefined;
+    }
+};
+
+export interface ICreateProjectPayload {
+    name: string;
+    description?: string;
+    taxonomy: { level1: string; level2: string };
+    sources?: ISource[];
+}
+
+/**
+ * Create a new project via ingestion-service
+ * POST /projects (X-Platform: vdr is set on ingestionApi)
+ */
+export const createProject = async (
+    payload: ICreateProjectPayload,
+): Promise<IProject | undefined> => {
+    try {
+        const res = await post(ingestionApi, "projects", payload);
+        if (res.status === 201) {
+            toast.success("Project created successfully");
+            return res.data;
+        }
+        return res.data;
+    } catch (error: any) {
+        console.error("createProject error", error);
+        const detail = error?.detail || "Failed to create project.";
+        toast.error(typeof detail === "string" ? detail : "Failed to create project.");
         return undefined;
     }
 };

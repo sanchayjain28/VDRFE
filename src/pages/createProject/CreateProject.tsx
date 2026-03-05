@@ -1,17 +1,49 @@
-import { Breadcrumb, Button, Form, Input, Select, Radio } from "antd";
+import { Breadcrumb, Button, Form, Input, Select, Radio, App } from "antd";
 import { ScopeSidebar } from "../../component";
 import "./CreateProject.scss";
 import { IMAGES, PATHS } from "../../shared";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { createProject } from "../../services/projects";
+import { useAppDispatch } from "../../store/hooks";
+import { setSelectedProjectId } from "../../store/app/appSlice";
+
+interface CreateProjectFormValues {
+  projectName: string;
+  description?: string;
+  services?: string;
+}
 
 const CreateProject = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { message } = App.useApp();
+  const [form] = Form.useForm<CreateProjectFormValues>();
   const [selectedVDR, setSelectedVDR] = useState<string>("sharepoint");
   const [selectedScopes, setSelectedScopes] = useState<string[]>([]);
+  const [isCreating, setIsCreating] = useState(false);
 
-  const handleCreateProject = () => {
-    navigate(PATHS.projectDetails);
+  const handleCreateProject = async () => {
+    try {
+      const values = await form.validateFields();
+      setIsCreating(true);
+
+      const project = await createProject({
+        name: values.projectName,
+        description: values.description,
+        taxonomy: { level1: "VDR", level2: selectedVDR },
+      });
+
+      if (project) {
+        dispatch(setSelectedProjectId(project.id));
+        message.success("Project created successfully!");
+        navigate(PATHS.projectDetails, { state: { projectId: project.id } });
+      }
+    } catch (error) {
+      console.error("Create project failed:", error);
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   return (
@@ -53,9 +85,9 @@ const CreateProject = () => {
 
               <div className="scope-details-content">
                 <div className="create-project-form">
-                  <Form layout="vertical" className="add-scope-form">
+                  <Form form={form} layout="vertical" className="add-scope-form">
                     <Form.Item
-                      name="scopeName"
+                      name="projectName"
                       label={<span>Project Name</span>}
                       required={false}
                       rules={[
@@ -150,7 +182,7 @@ const CreateProject = () => {
                 <Button className="secondary-btn" size="large" shape="round">
                   Cancel
                 </Button>
-                <Button className="primary-btn" type="primary" size="large" shape="round" onClick={handleCreateProject}>
+                <Button className="primary-btn" type="primary" size="large" shape="round" onClick={handleCreateProject} loading={isCreating}>
                   CREATE PROJECT
                 </Button>
               </div>

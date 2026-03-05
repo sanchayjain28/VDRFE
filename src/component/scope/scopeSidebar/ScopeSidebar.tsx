@@ -9,11 +9,13 @@ interface ScopeSidebarProps {
   showCheckboxes?: boolean;
   selectedScopes?: string[];
   onScopeSelectionChange?: (selectedScopes: string[]) => void;
+  onTopicSelect?: (topic: ITopic | null) => void;
 }
 
-const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSelectionChange }: ScopeSidebarProps) => {
+const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSelectionChange, onTopicSelect }: ScopeSidebarProps) => {
   const [isAddScopeOpen, setIsAddScopeOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeScopeId, setActiveScopeId] = useState<string | null>(null);
 
   // Get scopes from Redux store (locally added scopes via ADD SCOPE button)
   const reduxScopes = useAppSelector((state) => state.scope.scopes);
@@ -29,7 +31,14 @@ const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSele
     if (!projectId) return;
     setIsTopicsLoading(true);
     getTopics(projectId)
-      .then((data) => setApiTopics(data ?? []))
+      .then((data) => {
+        const topics = data ?? [];
+        setApiTopics(topics);
+        if (topics.length > 0) {
+          setActiveScopeId(topics[0].id);
+          onTopicSelect?.(topics[0]);
+        }
+      })
       .finally(() => setIsTopicsLoading(false));
   }, [projectId]);
 
@@ -59,6 +68,13 @@ const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSele
       ? selectedScopes.filter((scope) => scope !== displayName)
       : [...selectedScopes, displayName];
     onScopeSelectionChange?.(newSelected);
+  };
+
+  const handleScopeClick = (scopeId: string, displayName: string) => {
+    if (showCheckboxes) return;
+    setActiveScopeId(scopeId);
+    const topic = apiTopics.find((t) => t.id === scopeId) ?? null;
+    onTopicSelect?.(topic ?? { id: scopeId, name: displayName, instruction: "", project_id: "", is_active: true, created_at: "", updated_at: "" });
   };
 
   return (
@@ -99,13 +115,13 @@ const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSele
         ) : (
           filteredScopes.map((scope) => {
             const isSelected = isScopeSelected(scope.displayName);
-            const isActive = !showCheckboxes && scope.displayName === (filteredScopes[0]?.displayName ?? "");
+            const isActive = !showCheckboxes && scope.id === activeScopeId;
 
             return (
               <div
                 key={scope.id}
                 className={`scope-item ${isActive ? "active" : ""} ${showCheckboxes ? "with-checkbox" : ""}`}
-                onClick={() => handleScopeToggle(scope.displayName)}
+                onClick={() => showCheckboxes ? handleScopeToggle(scope.displayName) : handleScopeClick(scope.id, scope.displayName)}
               >
                 {showCheckboxes && (
                   <Checkbox
@@ -141,6 +157,11 @@ const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSele
       <AddScope
         open={isAddScopeOpen}
         onClose={() => setIsAddScopeOpen(false)}
+        onSuccess={(topic) => {
+          setApiTopics((prev) => [...prev, topic]);
+          setActiveScopeId(topic.id);
+          onTopicSelect?.(topic);
+        }}
       />
     </>
   );
