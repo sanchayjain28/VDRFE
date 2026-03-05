@@ -4,6 +4,7 @@ interface IConfig {
   BASE_URL: string;
   USER_BASE_URL: string;
   INGESTION_BASE_URL: string;
+  VDR_AGENT_BASE_URL: string;
   HOST: string;
 }
 // For Localhost
@@ -11,6 +12,7 @@ const LOCALHOST_CONFIG: IConfig = {
   BASE_URL: "https://dev.test.com/",
   USER_BASE_URL: "https://dev.test.com/",
   INGESTION_BASE_URL: "http://localhost:8001/ingestion/",
+  VDR_AGENT_BASE_URL: "http://localhost:8004/vdr-agent/",
   HOST: hostname,
 };
 
@@ -18,6 +20,7 @@ const DEV_CONFIG: IConfig = {
   BASE_URL: "https://dev.test.com/",
   USER_BASE_URL: "https://dev.test.com/",
   INGESTION_BASE_URL: "https://dev-ingestion.ermtools.app/ingestion/",
+  VDR_AGENT_BASE_URL: "https://TBD/",
   HOST: hostname,
 };
 
@@ -25,6 +28,7 @@ const PRE_PROD_CONFIG: IConfig = {
   BASE_URL: "https://prod.test.com/",
   USER_BASE_URL: "https://prod.test.com/",
   INGESTION_BASE_URL: "https://prod-ingestion.ermtools.app/ingestion/",
+  VDR_AGENT_BASE_URL: "https://TBD/",
   HOST: hostname,
 };
 

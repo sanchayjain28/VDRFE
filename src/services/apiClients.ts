@@ -83,6 +83,14 @@ export const ingestionApi = axios.create({
   },
 });
 
+export const vdrAgentApi = axios.create({
+  baseURL: configs.VDR_AGENT_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+    Subdomain: getSubdomain(),
+  },
+});
+
 // Alias for axiosClient if needed
 export const ragApi = axiosClient;
 
@@ -168,7 +176,7 @@ const setupResponseInterceptor = (client: AxiosInstance) => {
   });
 };
 
-[axiosClient, ingestionApi].forEach((client) => {
+[axiosClient, ingestionApi, vdrAgentApi].forEach((client) => {
   applyRequestInterceptor(client);
   setupResponseInterceptor(client);
 });
