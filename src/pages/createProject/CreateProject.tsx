@@ -1,5 +1,4 @@
 import { Breadcrumb, Button, Form, Input, Select, Radio, App } from "antd";
-import { ScopeSidebar } from "../../component";
 import "./CreateProject.scss";
 import { IMAGES, PATHS } from "../../shared";
 import { useNavigate } from "react-router-dom";
@@ -21,7 +20,6 @@ const CreateProject = () => {
   const { message } = App.useApp();
   const [form] = Form.useForm<CreateProjectFormValues>();
   const [selectedVDR, setSelectedVDR] = useState<string>("sharepoint");
-  const [selectedScopes, setSelectedScopes] = useState<string[]>([]);
   const [isCreating, setIsCreating] = useState(false);
 
   const handleCreateProject = async () => {
@@ -56,15 +54,6 @@ const CreateProject = () => {
       <div className="scope-page-container create-project-page">
         <div className="inner-app-wrap">
           <div className="inner-app-row">
-            {/* LEFT SIDEBAR */}
-            <div className="scope-sidebar">
-              <ScopeSidebar
-                showCheckboxes={true}
-                selectedScopes={selectedScopes}
-                onScopeSelectionChange={setSelectedScopes}
-              />
-            </div>
-
             {/* MAIN CONTENT */}
             <div className="content">
               <div className="scope-header-wrapper">

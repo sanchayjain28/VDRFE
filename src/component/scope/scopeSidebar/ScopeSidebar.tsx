@@ -137,30 +137,6 @@ const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSele
                   />
                 )}
                 <span className="side-menu-text">{scope.displayName}</span>
-                {!showCheckboxes && (
-                  <span className="flag-icon-wrap">
-                    <i className="erm-icon flag-icon" />
-                  </span>
-                )}
-                {!showCheckboxes && (
-                  <Popconfirm
-                    title="Delete topic?"
-                    description="This will permanently delete this topic and all its data."
-                    onConfirm={(e) => { e?.stopPropagation(); handleDeleteTopic(scope.id); }}
-                    onCancel={(e) => e?.stopPropagation()}
-                    okText="Delete"
-                    cancelText="Cancel"
-                    okButtonProps={{ danger: true }}>
-                    <Button
-                      type="text"
-                      size="small"
-                      danger
-                      aria-label="Delete topic"
-                      onClick={(e) => e.stopPropagation()}
-                      icon={<i className="erm-icon close-icon" />}
-                    />
-                  </Popconfirm>
-                )}
               </div>
             );
           })

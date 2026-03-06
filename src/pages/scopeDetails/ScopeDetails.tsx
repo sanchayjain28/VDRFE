@@ -449,7 +449,7 @@ const ScopeDetails = () => {
               },
             },
             {
-              title: "Confidence",
+              title: "Scope Matching Confidence",
               key: "confidence",
               width: 110,
               render: (_, record) => (
@@ -459,7 +459,7 @@ const ScopeDetails = () => {
               ),
             },
             {
-              title: "Justification",
+              title: "Scope Matching Justification",
               key: "justification",
               render: (_, record) => {
                 const text = record.justification;

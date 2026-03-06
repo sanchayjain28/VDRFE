@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Breadcrumb, Table, Avatar, Button } from "antd";
+import { Breadcrumb, Table, Avatar, Button, Spin } from "antd";
 import SelectedSourcesDrawer from "../../component/selectedSourcesDrawer/SelectedSourcesDrawer";
 import type { ColumnsType } from "antd/es/table";
 import { IMAGES, PATHS } from "../../shared";
@@ -9,6 +9,8 @@ import { Activity } from "../../component/dashboard/recentActivity/RecentActivit
 import CustomPagination from "../../component/pagination/CustomPagination";
 import { setSelectedProjectId } from "../../store/app/appSlice";
 import { store } from "../../store/store";
+import { useAppSelector } from "../../store/hooks";
+import { getTopics } from "../../services/vdrAgent";
 import "./ProjectDetails.scss";
 
 interface ScopeData {
@@ -23,11 +25,6 @@ interface ScopeData {
     level: string;
     color: "yellow" | "red" | "green";
   };
-  redFlag: number;
-  openComments: number;
-  hasViewDetails?: boolean;
-  hasObservation?: boolean;
-  observationText?: string;
 }
 
 const PAGE_SIZE = 10;
@@ -37,7 +34,8 @@ const ProjectDetails = () => {
   const location = useLocation();
   const [currentPage, setCurrentPage] = useState(1);
 
-  const projectId = (location.state as { projectId?: string })?.projectId ?? null;
+  const reduxProjectId = useAppSelector((state) => state.app.selectedProjectId);
+  const projectId = (location.state as { projectId?: string })?.projectId ?? reduxProjectId;
   const [isIngestDrawerOpen, setIsIngestDrawerOpen] = useState(false);
 
   // Sync projectId from navigation state into Redux store
@@ -47,27 +45,26 @@ const ProjectDetails = () => {
     }
   }, [projectId]);
 
-  const [scopeData] = useState<ScopeData[]>([
-    { key: "1", scope: "1. ESG Strategy", dueDate: "23/1/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "Moderate", color: "yellow" }, redFlag: 3, openComments: 5, hasViewDetails: true },
-    { key: "2", scope: "2. Organisation and Responsibility", dueDate: "2/2/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "Very high", color: "red" }, redFlag: 0, openComments: 10, hasObservation: true, observationText: "Observation: Certain details could not be verified during the internal review process." },
-    { key: "3", scope: "3. Policies and Business Ethics", dueDate: "23/1/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "Low", color: "green" }, redFlag: 3, openComments: 3 },
-    { key: "4", scope: "4. Disclosure and Reporting", dueDate: "23/1/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "High", color: "red" }, redFlag: 3, openComments: 6 },
-    { key: "5", scope: "5. Risk Management & Assurance", dueDate: "15/2/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "Moderate", color: "yellow" }, redFlag: 1, openComments: 4 },
-    { key: "6", scope: "6. Customer Engagement", dueDate: "20/2/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "Low", color: "green" }, redFlag: 0, openComments: 2 },
-    { key: "7", scope: "7. Supply Chain Management", dueDate: "25/2/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "High", color: "red" }, redFlag: 2, openComments: 8 },
-    { key: "8", scope: "8. Sustainable Products", dueDate: "1/3/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "Moderate", color: "yellow" }, redFlag: 1, openComments: 5 },
-    { key: "9", scope: "9. Labour Laws & Human Rights", dueDate: "5/3/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "Very high", color: "red" }, redFlag: 4, openComments: 12 },
-    { key: "10", scope: "10. Grievance Mechanisms and Monitoring", dueDate: "10/3/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "Low", color: "green" }, redFlag: 0, openComments: 3 },
-    { key: "11", scope: "11. Working Conditions & Terms of Employment", dueDate: "15/3/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "Moderate", color: "yellow" }, redFlag: 2, openComments: 7 },
-    { key: "12", scope: "12. Employee Engagement", dueDate: "20/3/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "Low", color: "green" }, redFlag: 0, openComments: 4 },
-    { key: "13", scope: "13. Diversity & Inclusion", dueDate: "25/3/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "Moderate", color: "yellow" }, redFlag: 1, openComments: 6 },
-    { key: "14", scope: "14. Stakeholder Engagement", dueDate: "30/3/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "Low", color: "green" }, redFlag: 0, openComments: 3 },
-    { key: "15", scope: "15. Energy Efficiency", dueDate: "5/4/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "High", color: "red" }, redFlag: 3, openComments: 9 },
-    { key: "16", scope: "16. GHG Emissions & Carbon Footprint", dueDate: "10/4/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "Very high", color: "red" }, redFlag: 5, openComments: 11 },
-    { key: "17", scope: "17. Natural Hazards & Climate Change Risk", dueDate: "15/4/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "Moderate", color: "yellow" }, redFlag: 2, openComments: 5 },
-    { key: "18", scope: "18. Environmental Management", dueDate: "20/4/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "Low", color: "green" }, redFlag: 0, openComments: 4 },
-    { key: "19", scope: "19. Health and Safety Management", dueDate: "25/4/2026", assignedTo: { name: "Sarah Chen", avatar: IMAGES.avatarImage }, riskAssessment: { level: "High", color: "red" }, redFlag: 2, openComments: 8 },
-  ]);
+  const [scopeData, setScopeData] = useState<ScopeData[]>([]);
+  const [isTopicsLoading, setIsTopicsLoading] = useState(false);
+
+  // Fetch topics from API
+  useEffect(() => {
+    if (!projectId) return;
+    setIsTopicsLoading(true);
+    getTopics(projectId)
+      .then((topics) => {
+        const data: ScopeData[] = (topics ?? []).map((topic, index) => ({
+          key: topic.id,
+          scope: `${index + 1}. ${topic.name}`,
+          dueDate: "",
+          assignedTo: { name: "", avatar: IMAGES.avatarImage },
+          riskAssessment: { level: "-", color: "green" as const },
+        }));
+        setScopeData(data);
+      })
+      .finally(() => setIsTopicsLoading(false));
+  }, [projectId]);
 
   const paginatedScopeData = useMemo(() => {
     const start = (currentPage - 1) * PAGE_SIZE;
@@ -215,6 +212,7 @@ const ProjectDetails = () => {
               dataSource={paginatedScopeData}
               rowKey="key"
               pagination={false}
+              loading={isTopicsLoading}
             />
             <CustomPagination
               currentPage={currentPage}
