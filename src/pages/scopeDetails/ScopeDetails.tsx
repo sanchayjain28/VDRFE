@@ -161,7 +161,7 @@ const ScopeDetails = () => {
         // Compute uncategorised documents: fetch scopes for all done docs in parallel (capped at 100)
         const doneDocs = data.filter((d) => d.summary_status === "done").slice(0, 100);
         const scopeResults = await Promise.all(doneDocs.map((doc) => getDocumentScopes(doc.id)));
-        const uncategorised = doneDocs.filter((doc, idx) => {
+        const uncategorised = doneDocs.filter((_doc, idx) => {
           const res = scopeResults[idx];
           if (!res) return false;
           return res.categorisation_status === "uncategorised" ||

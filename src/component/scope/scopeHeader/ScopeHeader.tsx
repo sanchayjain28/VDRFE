@@ -17,10 +17,11 @@ interface IScopeHeader {
   onTopicUpdate?: (topic: ITopic) => void;
   isReclassifying?: boolean;
   onReclassify?: () => void;
+  projectName?: string;
 }
 
 const ScopeHeader = (props: IScopeHeader) => {
-  const { isChatOpen, onOpenReviewerModal, selectedTopic, onTopicUpdate, isReclassifying, onReclassify } = props;
+  const { isChatOpen, onOpenReviewerModal, selectedTopic, onTopicUpdate, isReclassifying, onReclassify, projectName } = props;
   const { message } = App.useApp();
   const navigate = useNavigate();
   const [isAddFlagDrawerOpen, setIsAddFlagDrawerOpen] = useState(false);
@@ -41,10 +42,7 @@ const ScopeHeader = (props: IScopeHeader) => {
   };
 
   const handleOpenInstructionModal = () => {
-    if (!selectedTopic) {
-      message.warning("Please select a scope from the sidebar first.");
-      return;
-    }
+    if (!selectedTopic) return;
     instructionForm.setFieldsValue({ instruction: selectedTopic.instruction ?? "" });
     setIsInstructionModalOpen(true);
   };
@@ -80,8 +78,11 @@ const ScopeHeader = (props: IScopeHeader) => {
                 title: <span onClick={() => navigate(PATHS.home)} className="breadcrumb-clickable">Home</span>,
               },
               {
-                title: <span onClick={() => navigate(PATHS.projectDetails)} className="breadcrumb-clickable">Shell - Air Quality</span>,
+                title: <span onClick={() => navigate(PATHS.projectDetails)} className="breadcrumb-clickable">{projectName || "Project"}</span>,
               },
+              ...(selectedTopic ? [{
+                title: <span>{selectedTopic.name}</span>,
+              }] : []),
             ]}
           />
         </div>
@@ -141,7 +142,7 @@ const ScopeHeader = (props: IScopeHeader) => {
       </div>
 
       <div className="scope-page-header">
-        <h2 className="page-heading">Air Quality</h2>
+        <h2 className="page-heading">{selectedTopic?.name ?? "Select a Scope"}</h2>
         <p>
           The category addresses management of air quality impacts resulting from stationary (e.g.,
           factories, power plants) and mobile sources...
