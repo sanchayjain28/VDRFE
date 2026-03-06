@@ -30,74 +30,6 @@ export interface IFitmentItem {
   reasoning: string | null;
 }
 
-export const createTopic = async (
-  projectId: string,
-  name: string,
-  instruction?: string,
-): Promise<ITopic | undefined> => {
-  try {
-    const res = await post(vdrAgentApi, "topics", { project_id: projectId, name, instruction: instruction ?? "" });
-    return res.data as ITopic;
-  } catch (error) {
-    console.error("createTopic error:", error);
-    return undefined;
-  }
-};
-
-export const getTopics = async (projectId: string): Promise<ITopic[] | undefined> => {
-  try {
-    return await get(vdrAgentApi, "topics", { params: { project_id: projectId } });
-  } catch (error) {
-    console.error("getTopics error:", error);
-    toast.error("Failed to load topics.");
-    return undefined;
-  }
-};
-
-export const getVdrDocuments = async (projectId: string): Promise<IDocumentListItem[] | undefined> => {
-  try {
-    return await get(vdrAgentApi, "documents", { params: { project_id: projectId } });
-  } catch (error) {
-    if ((error as any)?.status === 404 || (error as any)?.response?.status === 404) {
-      return [];
-    }
-    console.error("getVdrDocuments error:", error);
-    return undefined;
-  }
-};
-
-export const getDocumentFitment = async (documentId: string): Promise<IFitmentItem[] | undefined> => {
-  try {
-    return await get(vdrAgentApi, `documents/${documentId}/fitment`);
-  } catch (error) {
-    console.error("getDocumentFitment error:", error);
-    return undefined;
-  }
-};
-
-export const updateTopicInstruction = async (
-  topicId: string,
-  instruction: string,
-): Promise<ITopic | undefined> => {
-  try {
-    const res = await patch(vdrAgentApi, `topics/${topicId}`, { instruction });
-    return res.data as ITopic;
-  } catch (error) {
-    console.error("updateTopicInstruction error:", error);
-    return undefined;
-  }
-};
-
-export const deleteTopic = async (topicId: string): Promise<boolean> => {
-  try {
-    await deleteRequest(vdrAgentApi, `topics/${topicId}`);
-    return true;
-  } catch (error) {
-    console.error("deleteTopic error:", error);
-    return false;
-  }
-};
-
 export interface ITopicDocumentItem {
   document_id: string;
   file_name: string;
@@ -135,6 +67,79 @@ export interface IScopesResponse {
   scopes: IScopeAssignmentItem[];
 }
 
+export interface ITopicTemplate {
+  id: number;
+  name: string;
+  instruction: string;
+}
+
+export const createTopic = async (
+  projectId: string,
+  name: string,
+  instruction?: string,
+): Promise<ITopic | undefined> => {
+  try {
+    const res = await post(vdrAgentApi, "topics", { project_id: projectId, name, instruction: instruction ?? "" });
+    return res.data as ITopic;
+  } catch (error) {
+    console.error("createTopic error:", error);
+    return undefined;
+  }
+};
+
+export const getTopics = async (projectId: string): Promise<ITopic[] | undefined> => {
+  try {
+    return await get(vdrAgentApi, "topics", { params: { project_id: projectId } });
+  } catch (error) {
+    console.error("getTopics error:", error);
+    toast.error("Failed to load topics.");
+    return undefined;
+  }
+};
+
+export const getTopicTemplates = async (): Promise<ITopicTemplate[] | undefined> => {
+  try {
+    return await get(vdrAgentApi, "topics/templates");
+  } catch (error) {
+    console.error("getTopicTemplates error:", error);
+    return undefined;
+  }
+};
+
+export const bulkCreateTopics = async (
+  projectId: string,
+  topics: { name: string; instruction: string }[],
+): Promise<ITopic[] | undefined> => {
+  try {
+    const res = await post(vdrAgentApi, "topics/bulk", { project_id: projectId, topics });
+    return res.data as ITopic[];
+  } catch (error) {
+    console.error("bulkCreateTopics error:", error);
+    return undefined;
+  }
+};
+
+export const getVdrDocuments = async (projectId: string): Promise<IDocumentListItem[] | undefined> => {
+  try {
+    return await get(vdrAgentApi, "documents", { params: { project_id: projectId } });
+  } catch (error) {
+    if ((error as any)?.status === 404 || (error as any)?.response?.status === 404) {
+      return [];
+    }
+    console.error("getVdrDocuments error:", error);
+    return undefined;
+  }
+};
+
+export const getDocumentFitment = async (documentId: string): Promise<IFitmentItem[] | undefined> => {
+  try {
+    return await get(vdrAgentApi, `documents/${documentId}/fitment`);
+  } catch (error) {
+    console.error("getDocumentFitment error:", error);
+    return undefined;
+  }
+};
+
 export const getDocumentsByTopic = async (
   topicId: string,
   limit = 20,
@@ -169,5 +174,28 @@ export const reclassifyTopic = async (
     }
     console.error("reclassifyTopic error:", error);
     return undefined;
+  }
+};
+
+export const updateTopicInstruction = async (
+  topicId: string,
+  instruction: string,
+): Promise<ITopic | undefined> => {
+  try {
+    const res = await patch(vdrAgentApi, `topics/${topicId}`, { instruction });
+    return res.data as ITopic;
+  } catch (error) {
+    console.error("updateTopicInstruction error:", error);
+    return undefined;
+  }
+};
+
+export const deleteTopic = async (topicId: string): Promise<boolean> => {
+  try {
+    await deleteRequest(vdrAgentApi, `topics/${topicId}`);
+    return true;
+  } catch (error) {
+    console.error("deleteTopic error:", error);
+    return false;
   }
 };
