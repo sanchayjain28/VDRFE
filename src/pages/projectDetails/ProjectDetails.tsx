@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Breadcrumb, Table, Avatar, Button, Tooltip } from "antd";
+import { Breadcrumb, Table, Avatar, Button } from "antd";
 import SelectedSourcesDrawer from "../../component/selectedSourcesDrawer/SelectedSourcesDrawer";
 import type { ColumnsType } from "antd/es/table";
 import { IMAGES, PATHS } from "../../shared";
@@ -155,44 +155,6 @@ const ProjectDetails = () => {
         ),
       },
       {
-        title: "Risk Assessment",
-        dataIndex: "riskAssessment",
-        key: "riskAssessment",
-        width: "18%",
-        render: (riskAssessment: ScopeData["riskAssessment"]) => (
-          <div className="risk-assessment-cell">
-            <span className={`risk-dot ${riskAssessment.level.toLowerCase()}`}></span>
-            <span className="risk-level">{riskAssessment.level}</span>
-          </div>
-        ),
-      },
-      {
-        title: "Red Flag",
-        dataIndex: "redFlag",
-        key: "redFlag",
-        width: "12%",
-        render: (redFlag: number, record: ScopeData) => (
-          <Tooltip title={record.observationText || "No observation"}>
-            <div className="red-flag-cell">
-              <i className="erm-icon flag-icon" />
-              <span className="flag-divider"></span>
-              <span className="flag-count">{redFlag}</span>
-            </div>
-          </Tooltip>
-        ),
-      },
-      {
-        title: "Open Comments",
-        dataIndex: "openComments",
-        key: "openComments",
-        width: "15%",
-        render: (openComments: number) => (
-          <div className="open-comments-cell">
-            <span className="comments-count">{openComments}</span>
-          </div>
-        ),
-      },
-      {
         title: "",
         key: "viewDetails",
         width: "10%",
@@ -233,125 +195,20 @@ const ProjectDetails = () => {
             ]}
           />
         </div>
-        <Button
-          className="primary-btn"
-          type="primary"
-          shape="round"
-          onClick={() => setIsIngestDrawerOpen(true)}>
-          <i className="erm-icon refresh-icon" /> INGEST
-        </Button>
       </div>
       <div className="project-details-wrap">
         <div className="project-table-matrix-wrap">
-          <div className="flag-matrix-wrap">
-            <div className="flag-count-wrap">
-              <div className="flag-icon">
-                <img src={IMAGES.redFlagIcon} alt="Red Flag" />
-              </div>
-              <div className="flag-text">Red Flags</div>
-              <div className="flag-count">5</div>
-            </div>
-            <div className="risk-management-matrix-container">
-              <div className="risk-management-header">
-                Risk Assessment Matrix
-                <span> 101 total risks identified</span>
-              </div>
-              <div className="risk-management-matrix-wrap">
-                <div className="risk-management-matrix-text">Severity →</div>
-
-                <div className="risk-management-matrix-grid">
-                  {/* Empty cell for top-left corner */}
-                  <div className="label-cell empty"></div>
-
-                  {/* Column headers */}
-                  <div className="label-cell col-header">Unlikely</div>
-                  <div className="label-cell col-header">Possible</div>
-                  <div className="label-cell col-header">Likely</div>
-                  <div className="label-cell col-header">Certain</div>
-
-                  {/* Row 1 - High */}
-                  <div className="label-cell row-header">High</div>
-                  <div className="risk-cell green-dark">
-                    <span className="risk-number">7</span>
-                    <span className="risk-label">Risks</span>
-                  </div>
-                  <div className="risk-cell yellow">
-                    <span className="risk-number">12</span>
-                    <span className="risk-label">Risks</span>
-                  </div>
-                  <div className="risk-cell red">
-                    <span className="risk-number">15</span>
-                    <span className="risk-label">Risks</span>
-                  </div>
-                  <div className="risk-cell red-dark">
-                    <span className="risk-number">8</span>
-                    <span className="risk-label">Risks</span>
-                  </div>
-
-                  {/* Row 2 - Medium */}
-                  <div className="label-cell row-header">Medium</div>
-                  <div className="risk-cell green-dark">
-                    <span className="risk-number">5</span>
-                    <span className="risk-label">Risks</span>
-                  </div>
-                  <div className="risk-cell yellow-light">
-                    <span className="risk-number">3</span>
-                    <span className="risk-label">Risks</span>
-                  </div>
-                  <div className="risk-cell red-light">
-                    <span className="risk-number">0</span>
-                    <span className="risk-label">Risks</span>
-                  </div>
-                  <div className="risk-cell orange">
-                    <span className="risk-number">9</span>
-                    <span className="risk-label">Risks</span>
-                  </div>
-
-                  {/* Row 3 - Low */}
-                  <div className="label-cell row-header">Low</div>
-                  <div className="risk-cell green-light">
-                    <span className="risk-number">14</span>
-                    <span className="risk-label">Risks</span>
-                  </div>
-                  <div className="risk-cell green-medium">
-                    <span className="risk-number">8</span>
-                    <span className="risk-label">Risks</span>
-                  </div>
-                  <div className="risk-cell green-teal">
-                    <span className="risk-number">4</span>
-                    <span className="risk-label">Risks</span>
-                  </div>
-                  <div className="risk-cell yellow-orange">
-                    <span className="risk-number">5</span>
-                    <span className="risk-label">Risks</span>
-                  </div>
-
-                  {/* Row 4 - Negligible */}
-                  <div className="label-cell row-header">Negligible</div>
-                  <div className="risk-cell green-pale">
-                    <span className="risk-number">14</span>
-                    <span className="risk-label">Risks</span>
-                  </div>
-                  <div className="risk-cell green-light">
-                    <span className="risk-number">8</span>
-                    <span className="risk-label">Risks</span>
-                  </div>
-                  <div className="risk-cell green-teal">
-                    <span className="risk-number">4</span>
-                    <span className="risk-label">Risks</span>
-                  </div>
-                  <div className="risk-cell green-bright">
-                    <span className="risk-number">5</span>
-                    <span className="risk-label">Risks</span>
-                  </div>
-                </div>
-              </div>
-              <div className="likelihood">Likelihood →</div>
-            </div>
-          </div>
-
           <div className="risk-management-table-wrap">
-            <ScopeFilterBar isScopePage={true} />
+            <div className="table-top-bar">
+              <ScopeFilterBar isScopePage={true} />
+              <Button
+                className="primary-btn"
+                type="primary"
+                shape="round"
+                onClick={() => setIsIngestDrawerOpen(true)}>
+                <i className="erm-icon refresh-icon" /> INGEST
+              </Button>
+            </div>
             <Table<ScopeData>
               className="scope-table"
               columns={columns}

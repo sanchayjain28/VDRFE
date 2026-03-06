@@ -295,6 +295,13 @@
   .risk-management-table-wrap {
     margin-top: 25px;
 
+    .table-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
     .scope-table {
       .ant-table-tbody>tr {
         &:hover {
