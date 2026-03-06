@@ -23,9 +23,11 @@ const AddScope = ({ open, onClose, onSuccess }: AddScopeProps) => {
   const projectId = useAppSelector((state) => state.app.selectedProjectId);
   const [form] = Form.useForm<ScopeFormValues>();
   const scopeName = Form.useWatch("scopeName", form);
+  const instruction = Form.useWatch("instruction", form);
 
   // Check if required field is valid (not empty and meets minimum length)
-  const isFormValid = scopeName && scopeName.trim().length >= 4;
+  const isFormValid = scopeName && scopeName.trim().length >= 4
+    && instruction && instruction.trim().length > 0;
 
   const handleSubmit = async () => {
     try {
@@ -138,7 +140,10 @@ const AddScope = ({ open, onClose, onSuccess }: AddScopeProps) => {
             </span>
           }
           required={false}
-          rules={[{ max: 500, message: "Instruction must not exceed 500 characters" }]}>
+          rules={[
+            { required: true, message: "Please enter an instruction" },
+            { max: 500, message: "Instruction must not exceed 500 characters" },
+          ]}>
           <Input.TextArea
             className="textarea"
             rows={3}
