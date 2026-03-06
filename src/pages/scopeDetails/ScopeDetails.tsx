@@ -13,13 +13,12 @@ import "./ScopeDetails.scss";
 import ChatPanel from "../../component/chat/chatPanel/ChatPanel";
 import SelectReviewerModal from "../../component/scope/SelectReviewerModal/SelectReviewerModal";
 import PdfViewerDrawer from "../../component/pdfViewerDrawer";
-import SelectedSourcesDrawer from "../../component/selectedSourcesDrawer/SelectedSourcesDrawer";
 import { useAppSelector } from "../../store/hooks";
 import { setSelectedProjectId } from "../../store/app/appSlice";
 import { store } from "../../store/store";
 import { getProjectDocuments } from "../../services/sharepoint";
 import { getProjectDetails } from "../../services/projects";
-import { IProjectDocument, ISharepointList } from "../../store/sharepoint/sharepoint.interface";
+import { IProjectDocument } from "../../store/sharepoint/sharepoint.interface";
 import { IDocumentListItem, ITopic, getVdrDocuments } from "../../services/vdrAgent";
 
 type RightPanelView = "comments" | "chat" | null;
@@ -66,8 +65,6 @@ const ScopeDetails = () => {
     },
   ]);
 
-  const [isManageSyncOpen, setIsManageSyncOpen] = useState(false);
-
   const { projectDocuments, isProjectDocumentsLoading } = useAppSelector((state) => state.sharepoint);
 
   // VDR agent document data for status and fitment columns
@@ -102,21 +99,6 @@ const ScopeDetails = () => {
       // folder navigation - could be extended later
     } else {
       setIsPdfViewerOpened(true);
-    }
-  };
-
-  const handleIngestToggle = () => {
-    setIsManageSyncOpen(true);
-  };
-
-  const handleCloseManageSync = () => {
-    setIsManageSyncOpen(false);
-  };
-
-  const handleSelectSources = (_selectedItems: ISharepointList[]) => {
-    if (projectId) {
-      getProjectDetails(projectId);
-      getProjectDocuments(projectId);
     }
   };
 
@@ -225,7 +207,6 @@ const ScopeDetails = () => {
                 onCommentsToggle={handleCommentsToggle}
                 onChatToggle={handleChatToggle}
                 onOpenReviewerModal={handleOpenReviewerModal}
-                onIngestToggle={handleIngestToggle}
                 selectedTopic={selectedTopic}
                 onTopicUpdate={setSelectedTopic}
               />
@@ -361,12 +342,6 @@ const ScopeDetails = () => {
         pdfUrl="https://morth.nic.in/sites/default/files/dd12-13_0.pdf"
       />
 
-      <SelectedSourcesDrawer
-        open={isManageSyncOpen}
-        onClose={handleCloseManageSync}
-        projectId={projectId || ""}
-        onSelect={handleSelectSources}
-      />
     </>
   );
 };

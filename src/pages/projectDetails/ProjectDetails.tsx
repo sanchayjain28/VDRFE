@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Breadcrumb, Table, Avatar, Button, Tooltip } from "antd";
+import SelectedSourcesDrawer from "../../component/selectedSourcesDrawer/SelectedSourcesDrawer";
 import type { ColumnsType } from "antd/es/table";
 import { IMAGES, PATHS } from "../../shared";
 import { RecentActivity, ScopeFilterBar } from "../../component";
@@ -37,6 +38,7 @@ const ProjectDetails = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const projectId = (location.state as { projectId?: string })?.projectId ?? null;
+  const [isIngestDrawerOpen, setIsIngestDrawerOpen] = useState(false);
 
   // Sync projectId from navigation state into Redux store
   useEffect(() => {
@@ -218,8 +220,8 @@ const ProjectDetails = () => {
         </div>
         <div className="project-details-header-breadcrumb">
           <span>Service</span>
-          <Breadcrumb 
-            className="page-breadcrumb" 
+          <Breadcrumb
+            className="page-breadcrumb"
             separator={<i className="erm-icon breadcrumb-separator-icon"></i>}
             items={[
               {
@@ -231,6 +233,13 @@ const ProjectDetails = () => {
             ]}
           />
         </div>
+        <Button
+          className="primary-btn"
+          type="primary"
+          shape="round"
+          onClick={() => setIsIngestDrawerOpen(true)}>
+          <i className="erm-icon refresh-icon" /> INGEST
+        </Button>
       </div>
       <div className="project-details-wrap">
         <div className="project-table-matrix-wrap">
@@ -364,6 +373,12 @@ const ProjectDetails = () => {
           <RecentActivity activities={activities} />
         </div>
       </div>
+      <SelectedSourcesDrawer
+        open={isIngestDrawerOpen}
+        onClose={() => setIsIngestDrawerOpen(false)}
+        projectId={projectId || ""}
+        onSelect={() => {}}
+      />
     </div>
   );
 };
