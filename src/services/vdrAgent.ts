@@ -97,3 +97,77 @@ export const deleteTopic = async (topicId: string): Promise<boolean> => {
     return false;
   }
 };
+
+export interface ITopicDocumentItem {
+  document_id: string;
+  file_name: string;
+  file_path: string;
+  file_type: string;
+  summary_text: string | null;
+  confidence: "HIGH" | "MEDIUM" | "LOW";
+  justification: string | null;
+  needs_review: boolean;
+  created_at: string;
+}
+
+export interface ITopicDocumentsResponse {
+  total_count: number;
+  limit: number;
+  offset: number;
+  documents: ITopicDocumentItem[];
+}
+
+export interface IScopeAssignmentItem {
+  topic_id: string;
+  topic_name: string;
+  confidence: string;
+  justification: string | null;
+  needs_review: boolean;
+  review_reason: string | null;
+  rank: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IScopesResponse {
+  document_id: string;
+  categorisation_status: "pending" | "processing" | "done" | "uncategorised" | "failed";
+  scopes: IScopeAssignmentItem[];
+}
+
+export const getDocumentsByTopic = async (
+  topicId: string,
+  limit = 20,
+  offset = 0,
+): Promise<ITopicDocumentsResponse | undefined> => {
+  try {
+    return await get(vdrAgentApi, `topics/${topicId}/documents`, { params: { limit, offset } });
+  } catch (error) {
+    console.error("getDocumentsByTopic error:", error);
+    return undefined;
+  }
+};
+
+export const getDocumentScopes = async (documentId: string): Promise<IScopesResponse | undefined> => {
+  try {
+    return await get(vdrAgentApi, `documents/${documentId}/scopes`);
+  } catch (error) {
+    console.error("getDocumentScopes error:", error);
+    return undefined;
+  }
+};
+
+export const reclassifyTopic = async (
+  topicId: string,
+): Promise<{ message: string; project_id: string } | undefined> => {
+  try {
+    const res = await post(vdrAgentApi, `topics/${topicId}/reclassify`, {});
+    return res.data as { message: string; project_id: string };
+  } catch (error) {
+    if ((error as any)?.response?.status === 409 || (error as any)?.status === 409) {
+      throw new Error("Re-classification already in progress");
+    }
+    console.error("reclassifyTopic error:", error);
+    return undefined;
+  }
+};
