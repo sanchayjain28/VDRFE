@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Input, Button, Progress, Checkbox, Popconfirm, App } from "antd";
-import { AddScope } from "../../../component";
+import { Button, Progress, Checkbox, Popconfirm, App } from "antd";
 import { useAppSelector } from "../../../store/hooks";
 import { getTopics, ITopic, deleteTopic } from "../../../services/vdrAgent";
 import "./ScopeSidebar.scss";
@@ -10,12 +9,11 @@ interface ScopeSidebarProps {
   selectedScopes?: string[];
   onScopeSelectionChange?: (selectedScopes: string[]) => void;
   onTopicSelect?: (topic: ITopic | null) => void;
+  uncategorisedCount?: number;
 }
 
-const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSelectionChange, onTopicSelect }: ScopeSidebarProps) => {
+const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSelectionChange, onTopicSelect, uncategorisedCount }: ScopeSidebarProps) => {
   const { message } = App.useApp();
-  const [isAddScopeOpen, setIsAddScopeOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const [activeScopeId, setActiveScopeId] = useState<string | null>(null);
 
   // Get scopes from Redux store (locally added scopes via ADD SCOPE button)
@@ -49,13 +47,6 @@ const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSele
     const reduxItems = reduxScopes.map((s) => ({ id: s.id, displayName: s.scopeName }));
     return [...apiItems, ...reduxItems];
   }, [apiTopics, reduxScopes]);
-
-  // Filter combined scopes based on search term
-  const filteredScopes = useMemo(() => {
-    if (!searchTerm.trim()) return combinedScopes;
-    const lower = searchTerm.toLowerCase();
-    return combinedScopes.filter((s) => s.displayName.toLowerCase().includes(lower));
-  }, [combinedScopes, searchTerm]);
 
   // Determine if a scope is selected (by displayName for backward compatibility)
   const isScopeSelected = (displayName: string) => {
@@ -93,43 +84,30 @@ const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSele
     }
   };
 
+  const handleUncategorisedClick = () => {
+    setActiveScopeId("__uncategorised__");
+    onTopicSelect?.({
+      id: "__uncategorised__",
+      name: "Uncategorised",
+      instruction: "",
+      project_id: projectId ?? "",
+      is_active: true,
+      created_at: "",
+      updated_at: "",
+    } as ITopic);
+  };
+
   return (
     <>
       <h4 className="sidebar-heading">Scope</h4>
-      <div className="sidebar-search-wrapper">
-        <Input
-          placeholder="Quick find"
-          prefix={<i className="erm-icon search-icon" />}
-          className="quick-search"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <button
-          type="button"
-          className="status-trigger"
-          aria-label="Filter by status"
-        >
-          <i className="erm-icon filter-icon"></i>
-        </button>
-      </div>
-
-      <Button
-        type="link"
-        className="add-scope"
-        onClick={() => setIsAddScopeOpen(true)}
-      >
-        <i className="erm-icon plus-icon"></i> ADD SCOPE
-      </Button>
 
       <div className="scope-list">
-        {isTopicsLoading && filteredScopes.length === 0 ? (
+        {isTopicsLoading && combinedScopes.length === 0 ? (
           <div className="no-scopes-message">Loading topics...</div>
-        ) : filteredScopes.length === 0 ? (
-          <div className="no-scopes-message">
-            {searchTerm ? "No scopes found" : "No scopes available"}
-          </div>
+        ) : combinedScopes.length === 0 ? (
+          <div className="no-scopes-message">No scopes available</div>
         ) : (
-          filteredScopes.map((scope) => {
+          combinedScopes.map((scope) => {
             const isSelected = isScopeSelected(scope.displayName);
             const isActive = !showCheckboxes && scope.id === activeScopeId;
 
@@ -187,17 +165,20 @@ const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSele
             );
           })
         )}
-      </div>
 
-      <AddScope
-        open={isAddScopeOpen}
-        onClose={() => setIsAddScopeOpen(false)}
-        onSuccess={(topic) => {
-          setApiTopics((prev) => [...prev, topic]);
-          setActiveScopeId(topic.id);
-          onTopicSelect?.(topic);
-        }}
-      />
+        {!showCheckboxes && (
+          <>
+            <div className="scope-list-divider" />
+            <div
+              className={`scope-item uncategorised-item ${activeScopeId === "__uncategorised__" ? "active" : ""}`}
+              onClick={handleUncategorisedClick}
+            >
+              <span className="side-menu-text">Uncategorised</span>
+              <span className="uncategorised-count">({uncategorisedCount ?? 0})</span>
+            </div>
+          </>
+        )}
+      </div>
     </>
   );
 };

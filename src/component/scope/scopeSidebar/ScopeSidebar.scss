@@ -153,4 +153,19 @@
             }
         }
     }
+
+    .scope-list-divider {
+        height: 1px;
+        background: var(--border-color);
+        margin: 12px 0;
+    }
+
+    .uncategorised-item {
+        .uncategorised-count {
+            color: var(--primary);
+            opacity: 0.6;
+            font-size: 12px;
+            margin-left: auto;
+        }
+    }
 }
