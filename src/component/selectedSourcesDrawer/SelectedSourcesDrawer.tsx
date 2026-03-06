@@ -165,8 +165,8 @@ const SelectedSourcesDrawer: React.FC<SelectedSourcesDrawerProps> = ({
                 record.is_folder
                   ? IMAGES.sourceFolderIcon
                   : record.mime_type?.includes("spreadsheet")
-                  ? IMAGES.xlsIcon
-                  : IMAGES.pdfIcon
+                    ? IMAGES.xlsIcon
+                    : IMAGES.pdfIcon
               }
               alt={record.is_folder ? "Folder" : "File"}
             />

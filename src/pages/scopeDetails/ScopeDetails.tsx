@@ -6,7 +6,6 @@ import type { Comment } from "../../component/scope/comments/Comments";
 import {
   ScopeFilterBar,
   ScopeHeader,
-  ScopeSidebar,
   Comments,
 } from "../../component";
 import "./ScopeDetails.scss";
@@ -26,6 +25,7 @@ import {
   getVdrDocuments,
   getDocumentsByTopic,
   getDocumentScopes,
+  getTopics,
   reclassifyTopic,
 } from "../../services/vdrAgent";
 
@@ -56,6 +56,7 @@ const ScopeDetails = () => {
   const [isReviewerModalOpen, setIsReviewerModalOpen] = useState(false);
   const [isPdfViewerOpened, setIsPdfViewerOpened] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState<ITopic | null>(null);
+  const [projectName, setProjectName] = useState<string>("");
 
   // Topic document state
   const [topicDocuments, setTopicDocuments] = useState<ITopicDocumentItem[]>([]);
@@ -110,13 +111,17 @@ const ScopeDetails = () => {
   // VDR agent document data for status and fitment columns
   const [vdrDocuments, setVdrDocuments] = useState<IDocumentListItem[]>([]);
 
-  // Uncategorised documents — computed in polling loop
-  const [uncategorisedDocs, setUncategorisedDocs] = useState<IDocumentListItem[]>([]);
 
   useEffect(() => {
     if (projectId) {
-      getProjectDetails(projectId);
+      getProjectDetails(projectId).then((details) => {
+        if (details?.name) setProjectName(details.name);
+      });
       getProjectDocuments(projectId);
+      getTopics(projectId).then((data) => {
+        const topics = data ?? [];
+        if (topics.length > 0) setSelectedTopic(topics[0]);
+      });
     }
   }, [projectId]);
 
@@ -131,7 +136,7 @@ const ScopeDetails = () => {
 
   // Fetch topic documents when selectedTopic or topicDocPage changes
   useEffect(() => {
-    if (!selectedTopic || selectedTopic.id === "__uncategorised__") return;
+    if (!selectedTopic) return;
 
     const fetchTopicDocs = async () => {
       setIsTopicDocsLoading(true);
@@ -155,23 +160,10 @@ const ScopeDetails = () => {
 
     const fetchVdrData = async () => {
       const data = await getVdrDocuments(projectId);
-      if (data !== undefined) {
-        setVdrDocuments(data);
+      if (data !== undefined) setVdrDocuments(data);
 
-        // Compute uncategorised documents: fetch scopes for all done docs in parallel (capped at 100)
-        const doneDocs = data.filter((d) => d.summary_status === "done").slice(0, 100);
-        const scopeResults = await Promise.all(doneDocs.map((doc) => getDocumentScopes(doc.id)));
-        const uncategorised = doneDocs.filter((_doc, idx) => {
-          const res = scopeResults[idx];
-          if (!res) return false;
-          return res.categorisation_status === "uncategorised" ||
-            (res.scopes.length === 0 && res.categorisation_status === "done");
-        });
-        setUncategorisedDocs(uncategorised);
-      }
-
-      // If a real topic is selected, also refresh topic documents and check categorisation_status
-      if (selectedTopic && selectedTopic.id !== "__uncategorised__") {
+      // If a topic is selected, also refresh topic documents and check categorisation_status
+      if (selectedTopic) {
         // Re-fetch topic documents on each poll cycle
         const topicRes = await getDocumentsByTopic(selectedTopic.id, 20, (topicDocPage - 1) * 20);
         if (topicRes !== undefined) {
@@ -299,81 +291,10 @@ const ScopeDetails = () => {
     setIsReviewerModalOpen(false);
   };
 
-  const isUncategorisedView = selectedTopic?.id === "__uncategorised__";
-
   const isCategorisingInProgress =
     categorisationStatus === "pending" || categorisationStatus === "processing";
 
   const renderMainTable = () => {
-    if (isUncategorisedView) {
-      // Simplified table for uncategorised documents (Document, Status, File Summary only)
-      return (
-        <Table<IDocumentListItem>
-          className="files-table"
-          columns={[
-            {
-              title: "Document",
-              key: "document",
-              width: "30%",
-              render: (_, record) => (
-                <div className="file-title">
-                  <div className="file-icon">
-                    <img
-                      src={
-                        record.file_type?.includes("spreadsheet")
-                          ? IMAGES.xlsIcon
-                          : IMAGES.pdfIcon
-                      }
-                      alt="file"
-                    />
-                  </div>
-                  <div className="file-content">
-                    <div className="file-name">{record.file_name}</div>
-                    <div className="file-path">{record.file_path}</div>
-                  </div>
-                </div>
-              ),
-            },
-            {
-              title: "Status",
-              key: "status",
-              width: 130,
-              className: "text-align-right",
-              render: (_, record) => {
-                const status = record.summary_status ?? "pending";
-                const colorMap: Record<string, string> = {
-                  pending: "default",
-                  processing: "processing",
-                  done: "success",
-                  failed: "error",
-                };
-                return <Tag color={colorMap[status] ?? "default"}>{status}</Tag>;
-              },
-            },
-            {
-              title: "File Summary",
-              key: "fileSummary",
-              render: (_, record) => {
-                const text = record.summary_text;
-                if (!text) return <div className="table-two-line">-</div>;
-                const truncated = text.length > 120 ? text.slice(0, 120) + "…" : text;
-                return (
-                  <div className="table-two-line" title={text}>
-                    {truncated}
-                  </div>
-                );
-              },
-            },
-          ]}
-          dataSource={uncategorisedDocs}
-          rowKey="id"
-          tableLayout="fixed"
-          pagination={false}
-          locale={{ emptyText: "No uncategorised documents found." }}
-        />
-      );
-    }
-
     if (selectedTopic) {
       return (
         <Table<ITopicDocumentItem>
@@ -560,14 +481,6 @@ const ScopeDetails = () => {
       <div className="scope-page-container">
         <div className="inner-app-wrap">
           <div className="inner-app-row">
-            {/* LEFT SIDEBAR */}
-            <div className="scope-sidebar">
-              <ScopeSidebar
-                onTopicSelect={setSelectedTopic}
-                uncategorisedCount={uncategorisedDocs.length}
-              />
-            </div>
-
             {/* MAIN CONTENT */}
             <div className={`content ${isRightPanelOpen ? "panel-open" : ""}`}>
               <ScopeHeader
@@ -581,13 +494,14 @@ const ScopeDetails = () => {
                 onTopicUpdate={setSelectedTopic}
                 isReclassifying={categorisationStatus === "processing"}
                 onReclassify={handleReclassify}
+                projectName={projectName}
               />
 
               <div className="scope-details-content">
                 <ScopeFilterBar isScopePage={false} />
 
                 {/* Categorisation progress banner — shown while classification is running */}
-                {selectedTopic && !isUncategorisedView && isCategorisingInProgress && (
+                {selectedTopic && isCategorisingInProgress && (
                   <div className="categorisation-banner">
                     <span>Classifying documents...</span>
                     <Progress percent={0} status="active" showInfo={false} strokeColor="#82A78D" />
