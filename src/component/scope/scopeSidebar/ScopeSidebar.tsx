@@ -1,8 +1,8 @@
 import { useState, useMemo, useEffect } from "react";
-import { Input, Button, Progress, Checkbox } from "antd";
+import { Input, Button, Progress, Checkbox, Popconfirm, App } from "antd";
 import { AddScope } from "../../../component";
 import { useAppSelector } from "../../../store/hooks";
-import { getTopics, ITopic } from "../../../services/vdrAgent";
+import { getTopics, ITopic, deleteTopic } from "../../../services/vdrAgent";
 import "./ScopeSidebar.scss";
 
 interface ScopeSidebarProps {
@@ -13,6 +13,7 @@ interface ScopeSidebarProps {
 }
 
 const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSelectionChange, onTopicSelect }: ScopeSidebarProps) => {
+  const { message } = App.useApp();
   const [isAddScopeOpen, setIsAddScopeOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeScopeId, setActiveScopeId] = useState<string | null>(null);
@@ -75,6 +76,21 @@ const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSele
     setActiveScopeId(scopeId);
     const topic = apiTopics.find((t) => t.id === scopeId) ?? null;
     onTopicSelect?.(topic ?? { id: scopeId, name: displayName, instruction: "", project_id: "", is_active: true, created_at: "", updated_at: "" });
+  };
+
+  const handleDeleteTopic = async (topicId: string) => {
+    const success = await deleteTopic(topicId);
+    if (success) {
+      setApiTopics((prev) => prev.filter((t) => t.id !== topicId));
+      message.success("Topic deleted.");
+      // If deleted topic was active, clear selection
+      if (activeScopeId === topicId) {
+        setActiveScopeId(null);
+        onTopicSelect?.(null);
+      }
+    } else {
+      message.error("Failed to delete topic. Please try again.");
+    }
   };
 
   return (
@@ -147,6 +163,25 @@ const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSele
                   <span className="flag-icon-wrap">
                     <i className="erm-icon flag-icon" />
                   </span>
+                )}
+                {!showCheckboxes && (
+                  <Popconfirm
+                    title="Delete topic?"
+                    description="This will permanently delete this topic and all its data."
+                    onConfirm={(e) => { e?.stopPropagation(); handleDeleteTopic(scope.id); }}
+                    onCancel={(e) => e?.stopPropagation()}
+                    okText="Delete"
+                    cancelText="Cancel"
+                    okButtonProps={{ danger: true }}>
+                    <Button
+                      type="text"
+                      size="small"
+                      danger
+                      aria-label="Delete topic"
+                      onClick={(e) => e.stopPropagation()}
+                      icon={<i className="erm-icon close-icon" />}
+                    />
+                  </Popconfirm>
                 )}
               </div>
             );

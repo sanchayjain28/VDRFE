@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-import { get, patch, post, vdrAgentApi } from "./apiClients";
+import { get, patch, post, deleteRequest, vdrAgentApi } from "./apiClients";
 
 export interface ITopic {
   id: string;
@@ -85,5 +85,15 @@ export const updateTopicInstruction = async (
   } catch (error) {
     console.error("updateTopicInstruction error:", error);
     return undefined;
+  }
+};
+
+export const deleteTopic = async (topicId: string): Promise<boolean> => {
+  try {
+    await deleteRequest(vdrAgentApi, `topics/${topicId}`);
+    return true;
+  } catch (error) {
+    console.error("deleteTopic error:", error);
+    return false;
   }
 };
