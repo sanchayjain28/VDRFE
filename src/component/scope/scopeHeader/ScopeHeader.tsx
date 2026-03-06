@@ -15,10 +15,12 @@ interface IScopeHeader {
   onOpenReviewerModal?: () => void;
   selectedTopic?: ITopic | null;
   onTopicUpdate?: (topic: ITopic) => void;
+  isReclassifying?: boolean;
+  onReclassify?: () => void;
 }
 
 const ScopeHeader = (props: IScopeHeader) => {
-  const { isChatOpen, onOpenReviewerModal, selectedTopic, onTopicUpdate } = props;
+  const { isChatOpen, onOpenReviewerModal, selectedTopic, onTopicUpdate, isReclassifying, onReclassify } = props;
   const { message } = App.useApp();
   const navigate = useNavigate();
   const [isAddFlagDrawerOpen, setIsAddFlagDrawerOpen] = useState(false);
@@ -91,6 +93,15 @@ const ScopeHeader = (props: IScopeHeader) => {
             shape="round"
             onClick={handleOpenInstructionModal}>
             <i className="erm-icon setting" /> SET INSTRUCTION
+          </Button>
+
+          <Button
+            className="primary-btn"
+            type="primary"
+            shape="round"
+            onClick={onReclassify}
+            disabled={!selectedTopic || isReclassifying}>
+            <i className="erm-icon refresh-double-icon" /> RE-CLASSIFY
           </Button>
 
           <Button

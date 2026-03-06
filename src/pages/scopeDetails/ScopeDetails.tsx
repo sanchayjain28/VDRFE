@@ -26,6 +26,7 @@ import {
   getVdrDocuments,
   getDocumentsByTopic,
   getDocumentScopes,
+  reclassifyTopic,
 } from "../../services/vdrAgent";
 
 type RightPanelView = "comments" | "chat" | null;
@@ -55,6 +56,7 @@ const ScopeDetails = () => {
   const [isReviewerModalOpen, setIsReviewerModalOpen] = useState(false);
   const [isPdfViewerOpened, setIsPdfViewerOpened] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState<ITopic | null>(null);
+  const [projectName, setProjectName] = useState<string>("");
 
   // Topic document state
   const [topicDocuments, setTopicDocuments] = useState<ITopicDocumentItem[]>([]);
@@ -71,6 +73,23 @@ const ScopeDetails = () => {
   const handleCloseReviewerModal = useCallback(() => {
     setIsReviewerModalOpen(false);
   }, []);
+
+  const handleReclassify = useCallback(async () => {
+    if (!selectedTopic) return;
+    try {
+      const result = await reclassifyTopic(selectedTopic.id);
+      if (result) {
+        message.success("Re-classification started.");
+        setCategorisationStatus("processing");
+      }
+    } catch (err: any) {
+      if (err?.message?.includes("already in progress")) {
+        message.error("Re-classification already in progress.");
+      } else {
+        message.error("Failed to start re-classification.");
+      }
+    }
+  }, [selectedTopic, message]);
 
   const [rightPanelView, setRightPanelView] = useState<RightPanelView>(null);
   const [rightPanelWidth, setRightPanelWidth] = useState(400);
@@ -94,7 +113,9 @@ const ScopeDetails = () => {
 
   useEffect(() => {
     if (projectId) {
-      getProjectDetails(projectId);
+      getProjectDetails(projectId).then((details) => {
+        if (details?.name) setProjectName(details.name);
+      });
       getProjectDocuments(projectId);
     }
   }, [projectId]);
@@ -289,6 +310,8 @@ const ScopeDetails = () => {
                 onOpenReviewerModal={handleOpenReviewerModal}
                 selectedTopic={selectedTopic}
                 onTopicUpdate={setSelectedTopic}
+                isReclassifying={categorisationStatus === "processing"}
+                onReclassify={handleReclassify}
               />
 
               <div className="scope-details-content">
