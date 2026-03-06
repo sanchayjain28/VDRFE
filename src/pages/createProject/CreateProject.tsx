@@ -5,6 +5,7 @@ import { IMAGES, PATHS } from "../../shared";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { createProject } from "../../services/projects";
+import { getTopicTemplates, bulkCreateTopics } from "../../services/vdrAgent";
 import { useAppDispatch } from "../../store/hooks";
 import { setSelectedProjectId } from "../../store/app/appSlice";
 
@@ -36,6 +37,10 @@ const CreateProject = () => {
 
       if (project) {
         dispatch(setSelectedProjectId(project.id));
+        const templates = await getTopicTemplates();
+        if (templates && templates.length > 0) {
+          await bulkCreateTopics(project.id, templates);
+        }
         message.success("Project created successfully!");
         navigate(PATHS.projectDetails, { state: { projectId: project.id } });
       }
