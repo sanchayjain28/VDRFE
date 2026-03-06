@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
-import { Button, Table, Tag } from "antd";
+import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { App, Button, Progress, Table, Tag } from "antd";
 import { useLocation } from "react-router-dom";
 import { IMAGES } from "../../shared";
 import type { Comment } from "../../component/scope/comments/Comments";
@@ -19,13 +19,27 @@ import { store } from "../../store/store";
 import { getProjectDocuments } from "../../services/sharepoint";
 import { getProjectDetails } from "../../services/projects";
 import { IProjectDocument } from "../../store/sharepoint/sharepoint.interface";
-import { IDocumentListItem, ITopic, getVdrDocuments } from "../../services/vdrAgent";
+import {
+  IDocumentListItem,
+  ITopicDocumentItem,
+  ITopic,
+  getVdrDocuments,
+  getDocumentsByTopic,
+  getDocumentScopes,
+} from "../../services/vdrAgent";
 
 type RightPanelView = "comments" | "chat" | null;
 
 const POLL_INTERVAL_MS = 12000;
 
+const CONFIDENCE_COLOR_MAP: Record<string, string> = {
+  HIGH: "green",
+  MEDIUM: "orange",
+  LOW: "red",
+};
+
 const ScopeDetails = () => {
+  const { message } = App.useApp();
   const location = useLocation();
 
   // Sync projectId from navigation state into Redux (ensures correct project even after refresh path)
@@ -41,6 +55,14 @@ const ScopeDetails = () => {
   const [isReviewerModalOpen, setIsReviewerModalOpen] = useState(false);
   const [isPdfViewerOpened, setIsPdfViewerOpened] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState<ITopic | null>(null);
+
+  // Topic document state
+  const [topicDocuments, setTopicDocuments] = useState<ITopicDocumentItem[]>([]);
+  const [topicDocTotal, setTopicDocTotal] = useState(0);
+  const [topicDocPage, setTopicDocPage] = useState(1);
+  const [isTopicDocsLoading, setIsTopicDocsLoading] = useState(false);
+  const [categorisationStatus, setCategorisationStatus] = useState<string | null>(null);
+  const prevCategorisationStatus = useRef<string | null>(null);
 
   const handleOpenReviewerModal = useCallback(() => {
     setIsReviewerModalOpen(true);
@@ -77,14 +99,69 @@ const ScopeDetails = () => {
     }
   }, [projectId]);
 
+  // Reset page and clear topic docs when topic changes
+  useEffect(() => {
+    setTopicDocPage(1);
+    setTopicDocuments([]);
+    setTopicDocTotal(0);
+    setCategorisationStatus(null);
+    prevCategorisationStatus.current = null;
+  }, [selectedTopic]);
+
+  // Fetch topic documents when selectedTopic or topicDocPage changes
+  useEffect(() => {
+    if (!selectedTopic) return;
+
+    const fetchTopicDocs = async () => {
+      setIsTopicDocsLoading(true);
+      try {
+        const res = await getDocumentsByTopic(selectedTopic.id, 20, (topicDocPage - 1) * 20);
+        if (res !== undefined) {
+          setTopicDocuments(res.documents);
+          setTopicDocTotal(res.total_count);
+        }
+      } finally {
+        setIsTopicDocsLoading(false);
+      }
+    };
+
+    fetchTopicDocs();
+  }, [selectedTopic, topicDocPage]);
+
   // Polling useEffect — fetches vdr-agent document data every 12 seconds
   useEffect(() => {
     if (!projectId) return;
 
-    const fetchVdrData = () => {
-      getVdrDocuments(projectId).then((data) => {
-        if (data !== undefined) setVdrDocuments(data);
-      });
+    const fetchVdrData = async () => {
+      const data = await getVdrDocuments(projectId);
+      if (data !== undefined) setVdrDocuments(data);
+
+      // If a topic is selected, also refresh topic documents and check categorisation_status
+      if (selectedTopic) {
+        // Re-fetch topic documents on each poll cycle
+        const topicRes = await getDocumentsByTopic(selectedTopic.id, 20, (topicDocPage - 1) * 20);
+        if (topicRes !== undefined) {
+          setTopicDocuments(topicRes.documents);
+          setTopicDocTotal(topicRes.total_count);
+        }
+
+        // Check categorisation_status from any document's scopes endpoint
+        if (data && data.length > 0) {
+          const scopesRes = await getDocumentScopes(data[0].id);
+          if (scopesRes !== undefined) {
+            const newStatus = scopesRes.categorisation_status;
+            // Detect transition from processing -> done and show toast
+            if (
+              prevCategorisationStatus.current === "processing" &&
+              newStatus === "done"
+            ) {
+              message.success("Classification complete");
+            }
+            prevCategorisationStatus.current = newStatus;
+            setCategorisationStatus(newStatus);
+          }
+        }
+      }
     };
 
     fetchVdrData(); // immediate fetch on mount / projectId change
@@ -92,7 +169,7 @@ const ScopeDetails = () => {
     const intervalId = setInterval(fetchVdrData, POLL_INTERVAL_MS);
 
     return () => clearInterval(intervalId); // cleanup prevents memory leak
-  }, [projectId]);
+  }, [projectId, selectedTopic, topicDocPage]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleFileClick = (item: IProjectDocument) => {
     if (item.is_folder) {
@@ -188,6 +265,9 @@ const ScopeDetails = () => {
     setIsReviewerModalOpen(false);
   };
 
+  const isCategorisingInProgress =
+    categorisationStatus === "pending" || categorisationStatus === "processing";
+
   return (
     <>
       <div className="scope-page-container">
@@ -214,82 +294,204 @@ const ScopeDetails = () => {
               <div className="scope-details-content">
                 <ScopeFilterBar isScopePage={false} />
 
-                <Table<IProjectDocument>
-                  loading={isProjectDocumentsLoading}
-                  className="files-table"
-                  rowSelection={rowSelection}
-                  columns={[
-                    {
-                      title: "Document",
-                      dataIndex: "name",
-                      key: "name",
-                      width: "30%",
-                      render: (_, record) => (
-                        <div className="file-title cursor-pointer" onClick={() => handleFileClick(record)}>
-                          <div className="file-icon">
-                            <img src={record.is_folder ? IMAGES.sourceFolderIcon : record.file_type?.includes("spreadsheet") ? IMAGES.xlsIcon : IMAGES.pdfIcon} alt="file" />
+                {/* Categorisation progress banner — shown while classification is running */}
+                {selectedTopic && isCategorisingInProgress && (
+                  <div className="categorisation-banner">
+                    <span>Classifying documents...</span>
+                    <Progress percent={0} status="active" showInfo={false} strokeColor="#82A78D" />
+                  </div>
+                )}
+
+                {selectedTopic ? (
+                  <Table<ITopicDocumentItem>
+                    loading={isTopicDocsLoading}
+                    className="files-table"
+                    columns={[
+                      {
+                        title: "Document",
+                        key: "document",
+                        width: "25%",
+                        render: (_, record) => (
+                          <div className="file-title">
+                            <div className="file-icon">
+                              <img
+                                src={
+                                  record.file_type?.includes("spreadsheet")
+                                    ? IMAGES.xlsIcon
+                                    : IMAGES.pdfIcon
+                                }
+                                alt="file"
+                              />
+                            </div>
+                            <div className="file-content">
+                              <div className="file-name">{record.file_name}</div>
+                              <div className="file-path">{record.file_path}</div>
+                            </div>
                           </div>
-                          <div className="file-content">
-                            <div className="file-name">{record.name}</div>
-                            <div className="file-path">{record.file_path}</div>
-                          </div>
+                        ),
+                      },
+                      {
+                        title: "Status",
+                        key: "status",
+                        width: 130,
+                        className: "text-align-right",
+                        render: (_, record) => {
+                          const vdrDoc = vdrDocuments.find((d) => d.id === record.document_id);
+                          const status = vdrDoc?.summary_status ?? "pending";
+                          const colorMap: Record<string, string> = {
+                            pending: "default",
+                            processing: "processing",
+                            done: "success",
+                            failed: "error",
+                          };
+                          return <Tag color={colorMap[status] ?? "default"}>{status}</Tag>;
+                        },
+                      },
+                      {
+                        title: "File Summary",
+                        key: "fileSummary",
+                        width: "20%",
+                        render: (_, record) => {
+                          const text = record.summary_text;
+                          if (!text) return <div className="table-two-line">-</div>;
+                          const truncated = text.length > 120 ? text.slice(0, 120) + "…" : text;
+                          return (
+                            <div className="table-two-line" title={text}>
+                              {truncated}
+                            </div>
+                          );
+                        },
+                      },
+                      {
+                        title: "Confidence",
+                        key: "confidence",
+                        width: 110,
+                        render: (_, record) => (
+                          <Tag color={CONFIDENCE_COLOR_MAP[record.confidence] ?? "default"}>
+                            {record.confidence}
+                          </Tag>
+                        ),
+                      },
+                      {
+                        title: "Justification",
+                        key: "justification",
+                        render: (_, record) => {
+                          const text = record.justification;
+                          if (!text) return <div className="table-two-line">-</div>;
+                          return (
+                            <div className="table-two-line" title={text}>
+                              {text}
+                            </div>
+                          );
+                        },
+                      },
+                    ]}
+                    dataSource={topicDocuments}
+                    rowKey="document_id"
+                    tableLayout="fixed"
+                    expandable={{
+                      expandedRowRender: (record: ITopicDocumentItem) => (
+                        <div className="expanded-justification">
+                          <p>
+                            <strong>Full Justification:</strong>
+                          </p>
+                          <p>{record.justification || "No justification available."}</p>
                         </div>
                       ),
-                    },
-                    {
-                      title: "Status",
-                      key: "status",
-                      width: 160,
-                      className: "text-align-right",
-                      render: (_, record) => {
-                        const vdrDoc = vdrDocuments.find((d) => d.id === record.id);
-                        const status = vdrDoc?.summary_status ?? "pending";
-                        const colorMap: Record<string, string> = {
-                          pending: "default",
-                          processing: "processing",
-                          done: "success",
-                          failed: "error",
-                        };
-                        return <Tag color={colorMap[status] ?? "default"}>{status}</Tag>;
-                      },
-                    },
-                    {
-                      title: "File Summary",
-                      key: "fileSummary",
-                      width: "20%",
-                      render: (_, record) => {
-                        const vdrDoc = vdrDocuments.find((d) => d.id === record.id);
-                        const text = vdrDoc?.summary_text;
-                        if (!text) return <div className="table-two-line">-</div>;
-                        const truncated = text.length > 120 ? text.slice(0, 120) + "…" : text;
-                        return (
-                          <div className="table-two-line" title={text}>
-                            {truncated}
+                      expandIcon: () => null,
+                      expandRowByClick: true,
+                    }}
+                    pagination={{
+                      current: topicDocPage,
+                      pageSize: 20,
+                      total: topicDocTotal,
+                      onChange: (page: number) => setTopicDocPage(page),
+                      showSizeChanger: false,
+                    }}
+                    locale={{
+                      emptyText: isCategorisingInProgress
+                        ? "Classification in progress..."
+                        : "No documents classified under this topic yet.",
+                    }}
+                  />
+                ) : (
+                  <Table<IProjectDocument>
+                    loading={isProjectDocumentsLoading}
+                    className="files-table"
+                    rowSelection={rowSelection}
+                    columns={[
+                      {
+                        title: "Document",
+                        dataIndex: "name",
+                        key: "name",
+                        width: "30%",
+                        render: (_, record) => (
+                          <div className="file-title cursor-pointer" onClick={() => handleFileClick(record)}>
+                            <div className="file-icon">
+                              <img src={record.is_folder ? IMAGES.sourceFolderIcon : record.file_type?.includes("spreadsheet") ? IMAGES.xlsIcon : IMAGES.pdfIcon} alt="file" />
+                            </div>
+                            <div className="file-content">
+                              <div className="file-name">{record.name}</div>
+                              <div className="file-path">{record.file_path}</div>
+                            </div>
                           </div>
-                        );
+                        ),
                       },
-                    },
-                    {
-                      title: "Scope Fitting",
-                      dataIndex: "scopeFitting",
-                      key: "scopeFitting",
-                      width: "20%",
-                      render: (_, record) => {
-                        const vdrDoc = vdrDocuments.find((d) => d.id === record.id);
-                        if (!vdrDoc) return <div className="table-two-line">-</div>;
-                        return (
-                          <div className="table-two-line">
-                            {vdrDoc.fitment_done_count} / {vdrDoc.fitment_total_count}
-                          </div>
-                        );
+                      {
+                        title: "Status",
+                        key: "status",
+                        width: 160,
+                        className: "text-align-right",
+                        render: (_, record) => {
+                          const vdrDoc = vdrDocuments.find((d) => d.id === record.id);
+                          const status = vdrDoc?.summary_status ?? "pending";
+                          const colorMap: Record<string, string> = {
+                            pending: "default",
+                            processing: "processing",
+                            done: "success",
+                            failed: "error",
+                          };
+                          return <Tag color={colorMap[status] ?? "default"}>{status}</Tag>;
+                        },
                       },
-                    },
-                  ]}
-                  dataSource={projectDocuments}
-                  rowKey="id"
-                  tableLayout="fixed"
-                  pagination={false}
-                />
+                      {
+                        title: "File Summary",
+                        key: "fileSummary",
+                        width: "20%",
+                        render: (_, record) => {
+                          const vdrDoc = vdrDocuments.find((d) => d.id === record.id);
+                          const text = vdrDoc?.summary_text;
+                          if (!text) return <div className="table-two-line">-</div>;
+                          const truncated = text.length > 120 ? text.slice(0, 120) + "…" : text;
+                          return (
+                            <div className="table-two-line" title={text}>
+                              {truncated}
+                            </div>
+                          );
+                        },
+                      },
+                      {
+                        title: "Scope Fitting",
+                        dataIndex: "scopeFitting",
+                        key: "scopeFitting",
+                        width: "20%",
+                        render: (_, record) => {
+                          const vdrDoc = vdrDocuments.find((d) => d.id === record.id);
+                          if (!vdrDoc) return <div className="table-two-line">-</div>;
+                          return (
+                            <div className="table-two-line">
+                              {vdrDoc.fitment_done_count} / {vdrDoc.fitment_total_count}
+                            </div>
+                          );
+                        },
+                      },
+                    ]}
+                    dataSource={projectDocuments}
+                    rowKey="id"
+                    tableLayout="fixed"
+                    pagination={false}
+                  />
+                )}
               </div>
             </div>
 
