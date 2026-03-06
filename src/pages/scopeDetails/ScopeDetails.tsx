@@ -6,6 +6,7 @@ import type { Comment } from "../../component/scope/comments/Comments";
 import {
   ScopeFilterBar,
   ScopeHeader,
+  ScopeSidebar,
   Comments,
 } from "../../component";
 import "./ScopeDetails.scss";
@@ -65,6 +66,9 @@ const ScopeDetails = () => {
   const [isTopicDocsLoading, setIsTopicDocsLoading] = useState(false);
   const [categorisationStatus, setCategorisationStatus] = useState<string | null>(null);
   const prevCategorisationStatus = useRef<string | null>(null);
+
+  // Uncategorised documents state
+  const [uncategorisedDocs, setUncategorisedDocs] = useState<IDocumentListItem[]>([]);
 
   const handleOpenReviewerModal = useCallback(() => {
     setIsReviewerModalOpen(true);
@@ -137,6 +141,8 @@ const ScopeDetails = () => {
   // Fetch topic documents when selectedTopic or topicDocPage changes
   useEffect(() => {
     if (!selectedTopic) return;
+    // Sentinel guard: skip API call for the uncategorised virtual topic
+    if (selectedTopic.id === "__uncategorised__") return;
 
     const fetchTopicDocs = async () => {
       setIsTopicDocsLoading(true);
@@ -162,8 +168,8 @@ const ScopeDetails = () => {
       const data = await getVdrDocuments(projectId);
       if (data !== undefined) setVdrDocuments(data);
 
-      // If a topic is selected, also refresh topic documents and check categorisation_status
-      if (selectedTopic) {
+      // If a real topic is selected (not the uncategorised sentinel), refresh topic docs and categorisation status
+      if (selectedTopic && selectedTopic.id !== "__uncategorised__") {
         // Re-fetch topic documents on each poll cycle
         const topicRes = await getDocumentsByTopic(selectedTopic.id, 20, (topicDocPage - 1) * 20);
         if (topicRes !== undefined) {
@@ -187,6 +193,25 @@ const ScopeDetails = () => {
             setCategorisationStatus(newStatus);
           }
         }
+      }
+
+      // Compute uncategorised documents via parallel getDocumentScopes calls (capped at 100)
+      // Runs on every poll cycle regardless of selectedTopic so the count stays fresh in the sidebar
+      if (data && data.length > 0) {
+        const doneDocs = data.filter(d => d.summary_status === "done");
+        const capped = doneDocs.slice(0, 100);
+        const scopeResults = await Promise.all(
+          capped.map(doc => getDocumentScopes(doc.id))
+        );
+        const uncategorised = capped.filter((_doc, idx) => {
+          const res = scopeResults[idx];
+          if (!res) return false;
+          return (
+            res.categorisation_status === "uncategorised" ||
+            (res.scopes.length === 0 && res.categorisation_status === "done")
+          );
+        });
+        setUncategorisedDocs(uncategorised);
       }
     };
 
@@ -295,6 +320,73 @@ const ScopeDetails = () => {
     categorisationStatus === "pending" || categorisationStatus === "processing";
 
   const renderMainTable = () => {
+    // Branch 1: Uncategorised virtual topic — simplified 3-column table
+    if (selectedTopic?.id === "__uncategorised__") {
+      return (
+        <Table<IDocumentListItem>
+          className="files-table"
+          columns={[
+            {
+              title: "Document",
+              key: "document",
+              width: "30%",
+              render: (_, record) => (
+                <div className="file-title">
+                  <div className="file-icon">
+                    <img
+                      src={
+                        record.file_type?.includes("spreadsheet")
+                          ? IMAGES.xlsIcon
+                          : IMAGES.pdfIcon
+                      }
+                      alt="file"
+                    />
+                  </div>
+                  <div className="file-content">
+                    <div className="file-name">{record.file_name}</div>
+                    <div className="file-path">{record.file_path}</div>
+                  </div>
+                </div>
+              ),
+            },
+            {
+              title: "Status",
+              key: "status",
+              width: "15%",
+              render: (_, record) => {
+                const status = record.summary_status ?? "pending";
+                const colorMap: Record<string, string> = {
+                  pending: "default",
+                  processing: "processing",
+                  done: "success",
+                  failed: "error",
+                  uncategorised: "warning",
+                };
+                return <Tag color={colorMap[status] ?? "default"}>{status}</Tag>;
+              },
+            },
+            {
+              title: "File Summary",
+              key: "summary",
+              width: "55%",
+              render: (_, record) => {
+                const text = record.summary_text;
+                if (!text) return <div className="table-two-line">-</div>;
+                const truncated = text.length > 120 ? text.slice(0, 120) + "\u2026" : text;
+                return <div className="table-two-line" title={text}>{truncated}</div>;
+              },
+            },
+          ]}
+          dataSource={uncategorisedDocs}
+          rowKey="id"
+          tableLayout="fixed"
+          pagination={false}
+          locale={{ emptyText: "No uncategorised documents." }}
+        />
+      );
+    }
+
+    // Branch 2: Real topic selected — topic-filtered table with Confidence and Justification
     if (selectedTopic) {
       return (
         <Table<ITopicDocumentItem>
@@ -411,6 +503,7 @@ const ScopeDetails = () => {
       );
     }
 
+    // Branch 3: Default — all project documents table
     return (
       <Table<IProjectDocument>
         loading={isProjectDocumentsLoading}
@@ -481,6 +574,14 @@ const ScopeDetails = () => {
       <div className="scope-page-container">
         <div className="inner-app-wrap">
           <div className="inner-app-row">
+            {/* LEFT SIDEBAR */}
+            <div className="scope-sidebar">
+              <ScopeSidebar
+                onTopicSelect={setSelectedTopic}
+                uncategorisedCount={uncategorisedDocs.length}
+              />
+            </div>
+
             {/* MAIN CONTENT */}
             <div className={`content ${isRightPanelOpen ? "panel-open" : ""}`}>
               <ScopeHeader
