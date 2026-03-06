@@ -173,7 +173,7 @@ const CreateProject = () => {
                 </div>
               </div>
               <div className="create-project-footer">
-                <Button className="secondary-btn" size="large" shape="round">
+                <Button className="secondary-btn" size="large" shape="round" onClick={() => navigate(-1)}>
                   Cancel
                 </Button>
                 <Button className="primary-btn" type="primary" size="large" shape="round" onClick={handleCreateProject} loading={isCreating}>

@@ -142,12 +142,12 @@ const AddScope = ({ open, onClose, onSuccess }: AddScopeProps) => {
           required={false}
           rules={[
             { required: true, message: "Please enter an instruction" },
-            { max: 500, message: "Instruction must not exceed 500 characters" },
+            { max: 5000, message: "Instruction must not exceed 5000 characters" },
           ]}>
           <Input.TextArea
             className="textarea"
             rows={3}
-            maxLength={500}
+            maxLength={5000}
             placeholder="Provide instructions for this scope."
           />
         </Form.Item>

@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Drawer, Input, Breadcrumb, Button, Spin } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import Table, { ColumnsType } from "antd/es/table";
 import { IMAGES } from "../../shared";
 import { useAppSelector } from "../../store/hooks";
 import { getSharePointList, syncProject } from "../../services/sharepoint";
-import { updateProjectSources } from "../../services/projects";
+import { updateProjectSources, getProjectDetails } from "../../services/projects";
 import type { ISharepointList, ISource } from "../../store/sharepoint/sharepoint.interface";
 import "./SelectedSourcesDrawer.scss";
 
@@ -34,6 +34,7 @@ const SelectedSourcesDrawer: React.FC<SelectedSourcesDrawerProps> = ({
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([{ name: "Root", path: "/" }]);
   const [isSyncing, setIsSyncing] = useState(false);
+  const lastResetPathRef = useRef<string | null>(null);
 
   // Build a set of already-synced item IDs and paths for matching
   const syncedItemIds = useMemo(() => new Set(syncedFiles.map((f) => f.id)), [syncedFiles]);
@@ -53,22 +54,26 @@ const SelectedSourcesDrawer: React.FC<SelectedSourcesDrawerProps> = ({
 
   useEffect(() => {
     if (open) {
+      lastResetPathRef.current = null;
+      getProjectDetails(projectId);
       setBreadcrumbs([{ name: "Root", path: "/" }]);
       getSharePointList("/", false);
     }
   }, [open]);
 
-  // Pre-check already-synced items when SharePoint list loads
+  // Track current folder path so we can detect folder changes
+  const currentFolderPath = breadcrumbs[breadcrumbs.length - 1]?.path ?? "/";
+
+  // Re-compute pre-checked synced items whenever folder changes OR syncedFiles loads
   useEffect(() => {
-    if (open && SharePointList.length > 0 && syncedFiles.length > 0) {
-      const syncedKeys = SharePointList.filter((item) => isItemSynced(item)).map((item) => item.id);
-      setSelectedRowKeys((prev) => {
-        // Merge: keep user's manual selections + add synced ones
-        const merged = new Set([...prev, ...syncedKeys]);
-        return [...merged];
-      });
-    }
-  }, [open, SharePointList, syncedFiles, isItemSynced]);
+    if (!open) return;
+    const syncedKeys = SharePointList.filter((item) => isItemSynced(item)).map((item) => item.id);
+    setSelectedRowKeys((prev) => {
+      // Keep any manual selections the user made, merge in synced keys
+      const manual = prev.filter((k) => !syncedKeys.includes(k) && !syncedFiles.some((sf) => sf.id === String(k)));
+      return [...new Set([...syncedKeys, ...manual])];
+    });
+  }, [open, currentFolderPath, syncedFiles, SharePointList, isItemSynced]);
 
   const handleFolderClick = (item: ISharepointList) => {
     const newPath = item.path;
@@ -265,7 +270,7 @@ const SelectedSourcesDrawer: React.FC<SelectedSourcesDrawerProps> = ({
               loading={isSyncing}
               onClick={handleSelect}
             >
-              SYNC <i className="erm-icon arrow-right-icon" />
+              EVALUATE <i className="erm-icon arrow-right-icon" />
             </Button>
           </div>
         </div>
@@ -280,6 +285,7 @@ const SelectedSourcesDrawer: React.FC<SelectedSourcesDrawerProps> = ({
               onChange: (newSelectedRowKeys: React.Key[]) => setSelectedRowKeys(newSelectedRowKeys),
               getCheckboxProps: (record: ISharepointList) => ({
                 disabled: isItemSynced(record),
+                title: isItemSynced(record) ? "Already ingested" : undefined,
               }),
             }}
             columns={columns}
