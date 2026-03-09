@@ -148,6 +148,21 @@ const ScopeHeader = (props: IScopeHeader) => {
           factories, power plants) and mobile sources...
         </p>
 
+        <div className="scope-findings-row">
+          <div className="scope-finding-card">
+            <h4 className="finding-label">Brief Finding</h4>
+            <p className="finding-text">
+              Initial review indicates partial documentation coverage for this scope. Key policies are present but operational monitoring records and third-party audit reports are missing.
+            </p>
+          </div>
+          <div className="scope-finding-card">
+            <h4 className="finding-label">Opportunity for Improvement</h4>
+            <p className="finding-text">
+              Recommend uploading annual compliance reports, incident logs, and corrective action plans to improve classification accuracy and completeness of scope coverage.
+            </p>
+          </div>
+        </div>
+
         <div className="meta-row">
           <div className="meta-row-left">
             <div className="collaborators-wrapper">
@@ -198,13 +213,14 @@ const ScopeHeader = (props: IScopeHeader) => {
         onOk={handleSubmitInstruction}
         okText="Save"
         confirmLoading={isSubmitting}
+        width={800}
         destroyOnClose>
         <Form form={instructionForm} layout="vertical">
           <Form.Item
             name="instruction"
             label="Instruction"
-            rules={[{ max: 1000, message: "Instruction must not exceed 1000 characters" }]}>
-            <Input.TextArea rows={5} maxLength={1000} placeholder="Enter instruction for this scope." />
+            rules={[{ max: 5000, message: "Instruction must not exceed 5000 characters" }]}>
+            <Input.TextArea rows={18} maxLength={5000} placeholder="Enter instruction for this scope." />
           </Form.Item>
         </Form>
       </Modal>

@@ -1,11 +1,11 @@
-import { Input } from "antd";
 import "./ScopeFilterBar.scss";
 
 const ScopeFilterBar = ({ isScopePage }: { isScopePage?: boolean }) => {
   return (
     <div className={`filter-bar ${isScopePage ? "scope-page" : ""}`}>
       <div className="filter-left">
-        <Input
+        {/* Search and Filter temporarily hidden — not functional yet */}
+        {/* <Input
           placeholder="Search..."
           prefix={<i className="erm-icon search-icon" />}
           className="quick-search"
@@ -13,7 +13,7 @@ const ScopeFilterBar = ({ isScopePage }: { isScopePage?: boolean }) => {
         <button type="button" className="status-trigger" aria-label="Filter by status">
           <i className="erm-icon filter-icon"></i>
           Filter
-        </button>
+        </button> */}
       </div>
 
       {!isScopePage && (

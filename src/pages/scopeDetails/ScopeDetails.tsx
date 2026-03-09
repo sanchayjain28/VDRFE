@@ -451,11 +451,16 @@ const ScopeDetails = () => {
             {
               title: "Scope Matching Confidence",
               key: "confidence",
-              width: 110,
+              width: 130,
               render: (_, record) => (
-                <Tag color={CONFIDENCE_COLOR_MAP[record.confidence] ?? "default"}>
-                  {record.confidence}
-                </Tag>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <Tag color={CONFIDENCE_COLOR_MAP[record.confidence] ?? "default"}>
+                    {record.confidence}
+                  </Tag>
+                  {record.confidence === "LOW" && (
+                    <img src={IMAGES.flagIcon} alt="low confidence" style={{ width: 16, height: 16 }} />
+                  )}
+                </div>
               ),
             },
             {
