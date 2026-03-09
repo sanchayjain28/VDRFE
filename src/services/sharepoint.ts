@@ -81,6 +81,32 @@ export const getProjectDocuments = async (
 };
 
 /**
+ * GET /projects/{project_id}/sync/status
+ * Returns e.g. { status: "in_progress" | "completed" | "failed" | "idle", ... }
+ */
+export const getSyncStatus = async (projectId: string): Promise<{ status: string } | undefined> => {
+    try {
+        return await get(ingestionApi, `projects/${projectId}/sync/status`);
+    } catch (error: any) {
+        console.error("getSyncStatus error", error);
+        return undefined;
+    }
+};
+
+/**
+ * GET /projects/{project_id}/sync/progress
+ * Returns e.g. { total: number, processed: number, status: string, ... }
+ */
+export const getSyncProgress = async (projectId: string): Promise<{ total: number; processed: number; status: string; workflow_status: string } | undefined> => {
+    try {
+        return await get(ingestionApi, `projects/${projectId}/sync/progress`);
+    } catch (error: any) {
+        console.error("getSyncProgress error", error);
+        return undefined;
+    }
+};
+
+/**
  * Trigger sync for a project
  * POST /projects/{project_id}/sync — no body, requires x-user-id header
  */

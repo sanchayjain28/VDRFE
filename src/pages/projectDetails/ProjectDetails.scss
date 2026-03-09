@@ -300,6 +300,80 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 12px;
+
+      .ingest-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .ingestion-status-msg {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--primary);
+        animation: fadeIn 0.4s ease;
+
+        .ingestion-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #82A78D;
+          animation: pulse 1.4s ease-in-out infinite;
+          flex-shrink: 0;
+        }
+
+        .dot-complete {
+          background: #52c41a;
+          animation: none;
+        }
+
+        .dot-failed {
+          background: #ff4d4f;
+          animation: none;
+        }
+
+        .doc-delta-inline {
+          font-weight: 600;
+          color: #52c41a;
+          margin-left: 2px;
+        }
+
+        .ingestion-elapsed-failed {
+          font-weight: 600;
+          color: #cf1322;
+          margin-left: 2px;
+        }
+
+        &.ingestion-complete { color: #389e0d; }
+        &.ingestion-failed { color: #cf1322; }
+      }
+
+      .refresh-icon-btn {
+        color: var(--primary);
+        opacity: 0.6;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .scope-table {

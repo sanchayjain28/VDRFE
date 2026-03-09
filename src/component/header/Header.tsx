@@ -25,10 +25,12 @@ const Header = () => {
     <div className="main-header">
       <div className="header-left">
         {/* {!hideLogo && ( */}
-        <div className="logo-ai">
-          <img src={IMAGES.logo} alt="Logo" loading="lazy" />
-        </div>
-        <span className="logo-ai-text">VDR AI</span>
+        <Link to={PATHS.home} className="logo-link">
+          <div className="logo-ai">
+            <img src={IMAGES.logo} alt="Logo" loading="lazy" />
+          </div>
+          <span className="logo-ai-text">VDR AI</span>
+        </Link>
         {/* )} */}
       </div>
 

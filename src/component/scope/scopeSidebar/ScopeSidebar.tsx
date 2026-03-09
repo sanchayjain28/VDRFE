@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
-import { Button, Progress, Checkbox, Popconfirm, App } from "antd";
+import { Checkbox, App } from "antd";
 import { useAppSelector } from "../../../store/hooks";
-import { getTopics, ITopic, deleteTopic } from "../../../services/vdrAgent";
+import { getTopics, ITopic, deleteTopic, getDocumentsByTopic } from "../../../services/vdrAgent";
 import "./ScopeSidebar.scss";
 
 interface ScopeSidebarProps {
@@ -25,6 +25,7 @@ const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSele
   // API-fetched topics
   const [apiTopics, setApiTopics] = useState<ITopic[]>([]);
   const [isTopicsLoading, setIsTopicsLoading] = useState(false);
+  const [topicDocCounts, setTopicDocCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (!projectId) return;
@@ -37,6 +38,14 @@ const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSele
           setActiveScopeId(topics[0].id);
           onTopicSelect?.(topics[0]);
         }
+        // Fetch document count for each topic
+        Promise.all(topics.map((t) => getDocumentsByTopic(t.id, 1, 0))).then((results) => {
+          const counts: Record<string, number> = {};
+          topics.forEach((t, i) => {
+            counts[t.id] = results[i]?.total_count ?? 0;
+          });
+          setTopicDocCounts(counts);
+        });
       })
       .finally(() => setIsTopicsLoading(false));
   }, [projectId]);
@@ -128,13 +137,9 @@ const ScopeSidebar = ({ showCheckboxes = false, selectedScopes = [], onScopeSele
                   />
                 )}
                 {!showCheckboxes && (
-                  <Progress
-                    type="circle"
-                    percent={50}
-                    size={24}
-                    strokeWidth={24}
-                    strokeColor="#82A78D"
-                  />
+                  <div className="scope-doc-count-circle">
+                    <span>{topicDocCounts[scope.id] ?? 0}</span>
+                  </div>
                 )}
                 <span className="side-menu-text">{scope.displayName}</span>
               </div>
